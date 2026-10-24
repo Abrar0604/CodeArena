@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Swords, Zap, Trophy, Cpu, Clock, Terminal, ArrowRight, Play } from 'lucide-react';
+import { HomeHeroActions } from '@/components/home/HomeHeroActions';
 
 export default function HomePage() {
   return (
@@ -23,23 +24,7 @@ export default function HomePage() {
         </p>
 
         {/* CTA Blocks */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2 font-mono text-xs">
-          <Link
-            href="/lobby"
-            className="w-full sm:w-auto px-8 py-3.5 bg-zinc-100 hover:bg-white text-zinc-950 font-black tracking-widest uppercase border border-zinc-200 transition active:translate-y-[1px] flex items-center justify-center gap-2.5"
-          >
-            <Swords className="w-4 h-4 stroke-[2.5]" />
-            <span>[ ENTER BATTLE LOBBY ]</span>
-          </Link>
-
-          <Link
-            href="/leaderboard"
-            className="w-full sm:w-auto px-7 py-3.5 bg-zinc-950 hover:bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-white font-bold tracking-widest uppercase transition flex items-center justify-center gap-2"
-          >
-            <Trophy className="w-4 h-4 text-zinc-400" />
-            <span>[ GLOBAL RANKINGS ]</span>
-          </Link>
-        </div>
+        <HomeHeroActions />
 
         {/* Tactical Terminal Preview */}
         <div className="pt-10 max-w-5xl mx-auto font-mono">

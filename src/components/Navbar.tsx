@@ -3,13 +3,13 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Swords, Trophy, User, Plus, Target, BarChart3 } from 'lucide-react';
+import { Swords, Trophy, User, Plus, Target, BarChart3, LogOut } from 'lucide-react';
 import { useUser } from '@/hooks/useUser';
 import { RatingBadge } from './RatingBadge';
 
 export function Navbar() {
   const pathname = usePathname();
-  const { user, mounted } = useUser();
+  const { user, mounted, isAuthenticated, logout } = useUser();
 
   const navLinks = [
     { href: '/lobby', label: 'LOBBY', icon: Swords },
@@ -70,36 +70,63 @@ export function Navbar() {
         </nav>
 
         {/* User Status & Action CTA */}
-        <div className="flex items-center gap-3">
-          {mounted && user && (
-            <div className="flex items-center gap-2">
-              <RatingBadge rating={user.rating} size="sm" />
-              <Link
-                href="/profile"
-                className="flex items-center gap-2 p-1 bg-zinc-900 border border-zinc-800 hover:border-zinc-700 transition"
-                title="View Gladiator Profile"
-              >
-                <div className="w-5 h-5 bg-zinc-800 border border-zinc-700 overflow-hidden shrink-0">
-                  <img
-                    src={user.avatar_url || `https://api.dicebear.com/7.x/bottts/svg?seed=${user.id}`}
-                    alt={user.username}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <span className="text-xs font-mono font-medium text-zinc-300 max-w-[85px] truncate hidden md:inline pr-1">
-                  {user.username}
-                </span>
-              </Link>
-            </div>
-          )}
+        <div className="flex items-center gap-2 sm:gap-3">
+          {mounted ? (
+            isAuthenticated && user ? (
+              <div className="flex items-center gap-2">
+                <RatingBadge rating={user.rating} size="sm" />
+                <Link
+                  href="/profile"
+                  className="flex items-center gap-2 p-1 bg-zinc-900 border border-zinc-800 hover:border-zinc-700 transition"
+                  title="View Gladiator Profile"
+                >
+                  <div className="w-5 h-5 bg-zinc-800 border border-zinc-700 overflow-hidden shrink-0">
+                    <img
+                      src={user.avatar_url || `https://api.dicebear.com/7.x/bottts/svg?seed=${user.id}`}
+                      alt={user.username}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <span className="text-xs font-mono font-medium text-zinc-300 max-w-[85px] truncate hidden md:inline pr-1">
+                    {user.username}
+                  </span>
+                </Link>
 
-          <Link
-            href="/lobby"
-            className="flex items-center gap-1.5 px-3.5 py-1.5 bg-zinc-100 hover:bg-white text-zinc-950 font-mono text-xs font-black tracking-wider uppercase border border-zinc-200 transition active:translate-y-[1px]"
-          >
-            <Plus className="w-3.5 h-3.5 stroke-[3]" />
-            <span>FIND MATCH</span>
-          </Link>
+                <button
+                  onClick={() => logout()}
+                  title="Sign Out"
+                  className="p-1.5 text-zinc-400 hover:text-rose-400 hover:bg-zinc-900 border border-transparent hover:border-zinc-800 transition"
+                >
+                  <LogOut className="w-4 h-4" />
+                </button>
+
+                <Link
+                  href="/lobby"
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-100 hover:bg-white text-zinc-950 font-mono text-xs font-black tracking-wider uppercase border border-zinc-200 transition active:translate-y-[1px]"
+                >
+                  <Plus className="w-3.5 h-3.5 stroke-[3]" />
+                  <span className="hidden sm:inline">FIND MATCH</span>
+                </Link>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 font-mono">
+                <Link
+                  href="/login"
+                  className="px-3 py-1.5 text-xs font-bold tracking-wider uppercase text-zinc-300 hover:text-white border border-zinc-800 hover:border-zinc-700 bg-zinc-900/60 transition"
+                >
+                  SIGN IN
+                </Link>
+                <Link
+                  href="/register"
+                  className="px-3 py-1.5 text-xs font-black tracking-wider uppercase text-zinc-950 bg-white hover:bg-zinc-200 border border-white transition active:translate-y-[1px] shadow-sm"
+                >
+                  SIGN UP
+                </Link>
+              </div>
+            )
+          ) : (
+            <div className="h-8 w-24 bg-zinc-900/40 border border-zinc-800/40" />
+          )}
         </div>
       </div>
     </header>

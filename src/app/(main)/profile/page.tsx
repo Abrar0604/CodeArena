@@ -3,11 +3,11 @@
 import React, { useState, useEffect } from 'react';
 import { useUser } from '@/hooks/useUser';
 import { RatingBadge } from '@/components/RatingBadge';
-import { Trophy, Swords, Shield, Zap, Edit2, Check, ArrowRight, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import { Trophy, Swords, Shield, Zap, Edit2, Check, ArrowRight, ArrowUpRight, ArrowDownRight, Lock, LogIn, UserPlus } from 'lucide-react';
 import Link from 'next/link';
 
 export default function ProfilePage() {
-  const { user, updateProfile } = useUser();
+  const { user, mounted, loading, isAuthenticated, updateProfile } = useUser();
   const [isEditing, setIsEditing] = useState(false);
   const [usernameInput, setUsernameInput] = useState(user?.username || '');
   const [recentBattles, setRecentBattles] = useState<any[]>([]);
@@ -23,6 +23,46 @@ export default function ProfilePage() {
       }
     } catch {}
   }, []);
+
+  if (mounted && !loading && (!isAuthenticated || !user)) {
+    return (
+      <div className="min-h-[calc(100vh-3.5rem)] flex items-center justify-center p-4 bg-[#050507] text-zinc-100 font-sans">
+        <div className="max-w-md w-full bg-zinc-950 border border-zinc-800 p-8 space-y-6 text-center">
+          <div className="w-12 h-12 bg-zinc-900 border border-zinc-700 mx-auto flex items-center justify-center">
+            <Lock className="w-6 h-6 text-zinc-300" />
+          </div>
+          <div className="space-y-2">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-zinc-900 border border-zinc-800 text-[10px] font-mono text-zinc-400 uppercase tracking-widest">
+              <span>AUTHENTICATION REQUIRED</span>
+            </div>
+            <h2 className="text-xl font-mono font-black uppercase text-white tracking-tight">
+              COMBATANT DOSSIER ACCESS
+            </h2>
+            <p className="text-xs text-zinc-400 font-mono leading-relaxed">
+              Sign in to view your verified combat history, ELO rating trajectory, and win/loss records.
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-2.5 pt-2 font-mono text-xs">
+            <Link
+              href="/login"
+              className="w-full py-3 bg-white hover:bg-zinc-200 text-zinc-950 font-black uppercase tracking-wider text-center border border-white transition flex items-center justify-center gap-2 shadow-sm"
+            >
+              <LogIn className="w-4 h-4" />
+              <span>[ SIGN IN TO ACCESS DOSSIER ]</span>
+            </Link>
+            <Link
+              href="/register"
+              className="w-full py-3 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-200 font-bold uppercase tracking-wider text-center transition flex items-center justify-center gap-2"
+            >
+              <UserPlus className="w-4 h-4" />
+              <span>[ CREATE COMBATANT ACCOUNT ]</span>
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!user) {
     return (

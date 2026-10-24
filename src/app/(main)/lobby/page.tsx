@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Swords, Clock, Zap, Trophy, X, Crosshair, Target } from 'lucide-react';
+import { Swords, Clock, Zap, Trophy, X, Crosshair, Target, Lock, LogIn, UserPlus } from 'lucide-react';
 import { useUser } from '@/hooks/useUser';
 import { RatingBadge } from '@/components/RatingBadge';
 import { useExperiment } from '@/hooks/useExperiment';
@@ -11,7 +11,7 @@ import { LobbyCTAConfig } from '@/lib/experiments/definitions';
 
 export default function LobbyPage() {
   const router = useRouter();
-  const { user, mounted } = useUser();
+  const { user, mounted, loading, isAuthenticated } = useUser();
   const { variant, config: ctaConfig, trackMetric } = useExperiment<LobbyCTAConfig>('lobby_cta_v1');
 
   const [isSearching, setIsSearching] = useState<boolean>(false);
@@ -70,6 +70,53 @@ export default function LobbyPage() {
       });
     } catch {}
   };
+
+  if (mounted && !loading && !isAuthenticated) {
+    return (
+      <div className="min-h-[calc(100vh-3.5rem)] flex flex-col justify-center items-center px-4 py-12 bg-[#050507] text-zinc-100 font-sans">
+        <div className="max-w-md w-full bg-zinc-950 border border-zinc-800 p-8 space-y-6 text-center">
+          <div className="w-12 h-12 bg-zinc-900 border border-zinc-700 mx-auto flex items-center justify-center">
+            <Lock className="w-6 h-6 text-zinc-300" />
+          </div>
+          <div className="space-y-2">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-zinc-900 border border-zinc-800 text-[10px] font-mono text-zinc-400 uppercase tracking-widest">
+              <span>AUTHENTICATION REQUIRED</span>
+            </div>
+            <h2 className="text-xl font-mono font-black uppercase text-white tracking-tight">
+              COMMISSION YOUR COMBATANT
+            </h2>
+            <p className="text-xs text-zinc-400 font-mono leading-relaxed">
+              Ranked 1v1 battles require a registered gladiator handle to calculate ELO ratings and save combat analytics.
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-2.5 pt-2 font-mono text-xs">
+            <Link
+              href="/register"
+              className="w-full py-3 bg-white hover:bg-zinc-200 text-zinc-950 font-black uppercase tracking-wider text-center border border-white transition flex items-center justify-center gap-2 shadow-sm"
+            >
+              <UserPlus className="w-4 h-4" />
+              <span>[ CREATE ACCOUNT // SIGN UP ]</span>
+            </Link>
+            <Link
+              href="/login"
+              className="w-full py-3 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-200 font-bold uppercase tracking-wider text-center transition flex items-center justify-center gap-2"
+            >
+              <LogIn className="w-4 h-4" />
+              <span>[ SIGN IN WITH CREDENTIALS ]</span>
+            </Link>
+            <Link
+              href="/practice"
+              className="pt-2 text-zinc-400 hover:text-emerald-400 text-xs font-mono transition flex items-center justify-center gap-1.5"
+            >
+              <Target className="w-3.5 h-3.5 text-emerald-400" />
+              <span>Or try Solo Practice Chamber without account →</span>
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-[calc(100vh-3.5rem)] flex flex-col justify-center items-center px-4 py-12 bg-[#050507] text-zinc-100 font-sans">

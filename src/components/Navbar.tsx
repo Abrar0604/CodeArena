@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Swords, Trophy, User, Plus } from 'lucide-react';
+import { Swords, Trophy, User, Plus, Target } from 'lucide-react';
 import { useUser } from '@/hooks/useUser';
 import { RatingBadge } from './RatingBadge';
 
@@ -13,13 +13,16 @@ export function Navbar() {
 
   const navLinks = [
     { href: '/lobby', label: 'LOBBY', icon: Swords },
+    { href: '/practice', label: 'PRACTICE', icon: Target },
     { href: '/leaderboard', label: 'LEADERBOARD', icon: Trophy },
     { href: '/profile', label: 'PROFILE', icon: User },
   ];
 
-  const isBattlePage = pathname.startsWith('/battle/') && !pathname.endsWith('/results');
+  const isArenaView =
+    (pathname.startsWith('/battle/') && !pathname.endsWith('/results')) ||
+    (pathname.startsWith('/practice/') && pathname !== '/practice');
 
-  if (isBattlePage) {
+  if (isArenaView) {
     return null;
   }
 

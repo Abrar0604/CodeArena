@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Swords, Clock, Zap, Trophy, X, Crosshair } from 'lucide-react';
+import { Swords, Clock, Zap, Trophy, X, Crosshair, Target } from 'lucide-react';
 import { useUser } from '@/hooks/useUser';
 import { RatingBadge } from '@/components/RatingBadge';
 import { useExperiment } from '@/hooks/useExperiment';
@@ -126,6 +127,26 @@ export default function LobbyPage() {
               </p>
             </div>
 
+            {/* Solo Practice Fallback if queue is empty */}
+            {searchTime >= 6 && (
+              <div className="p-4 bg-zinc-950 border border-cyan-800/80 space-y-3 max-w-sm mx-auto animate-in fade-in">
+                <div className="flex items-center justify-center gap-2 text-cyan-400 text-xs font-bold uppercase">
+                  <Target className="w-4 h-4" />
+                  <span>NO ACTIVE PEERS IN QUEUE</span>
+                </div>
+                <p className="text-[11px] text-zinc-400 font-sans leading-relaxed">
+                  No other combatants are currently in matchmaking. Want to jump straight into solo calibration against the test suite?
+                </p>
+                <Link
+                  href="/practice"
+                  className="w-full py-2 bg-cyan-950 hover:bg-cyan-900 border border-cyan-700 text-cyan-300 font-bold text-xs uppercase tracking-widest transition flex items-center justify-center gap-1.5"
+                >
+                  <Target className="w-3.5 h-3.5" />
+                  <span>ENTER SOLO PRACTICE DRILL →</span>
+                </Link>
+              </div>
+            )}
+
             <button
               onClick={handleCancelMatchmaking}
               className="inline-flex items-center gap-1.5 px-4 py-2 bg-zinc-900 hover:bg-zinc-800 text-rose-400 border border-zinc-800 hover:border-rose-800 font-mono text-xs font-bold uppercase tracking-wider transition active:translate-y-[1px]"
@@ -151,7 +172,7 @@ export default function LobbyPage() {
                 READY FOR COMBAT
               </h1>
               <p className="text-xs sm:text-sm text-zinc-400 max-w-md mx-auto leading-relaxed">
-                Ranked 1v1 matchmaking. Race against real competitors to write optimal algorithmic solutions evaluated in a sandboxed micro-runtime.
+                Ranked 1v1 matchmaking or solo drill chamber. Race against real competitors or hone your velocity against the automated test suite.
               </p>
             </div>
 
@@ -173,11 +194,11 @@ export default function LobbyPage() {
               ))}
             </div>
 
-            {/* Solid High-Contrast CTA Button */}
-            <div>
+            {/* CTAs: 1v1 Ranked or Solo Practice */}
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
               <button
                 onClick={handleStartMatchmaking}
-                className={`w-full sm:w-auto px-10 py-3.5 font-mono text-sm font-black tracking-widest uppercase border transition active:translate-y-[1px] ${
+                className={`w-full sm:w-auto px-8 py-3.5 font-mono text-sm font-black tracking-widest uppercase border transition active:translate-y-[1px] ${
                   variant?.id === 'urgency_speedrun'
                     ? 'bg-amber-400 hover:bg-amber-300 text-zinc-950 border-amber-300'
                     : 'bg-zinc-100 hover:bg-white text-zinc-950 border-zinc-200'
@@ -192,6 +213,14 @@ export default function LobbyPage() {
                   </span>
                 </div>
               </button>
+
+              <Link
+                href="/practice"
+                className="w-full sm:w-auto px-6 py-3.5 font-mono text-sm font-bold tracking-widest uppercase border border-zinc-800 bg-zinc-950 hover:bg-zinc-900 text-zinc-300 hover:text-white transition flex items-center justify-center gap-2"
+              >
+                <Target className="w-4 h-4 text-cyan-400" />
+                <span>[ SOLO PRACTICE ]</span>
+              </Link>
             </div>
 
             {/* Spec Highlights Grid */}

@@ -186,6 +186,30 @@ export function BattleArena({ battleId }: BattleArenaProps) {
                 winnerId: user?.id || 'guest_user',
               })
             );
+
+            try {
+              const histStored = localStorage.getItem('codearena_battle_history');
+              const hist = histStored ? JSON.parse(histStored) : [];
+              hist.unshift({
+                id: `battle-${Date.now()}`,
+                opponentName: opponent.username,
+                opponentRating: opponent.rating,
+                opponentAvatar: opponent.avatar_url,
+                problemTitle: problem.title,
+                problemSlug: problem.slug,
+                difficulty: problem.difficulty,
+                language: SUPPORTED_LANGUAGES[language].name,
+                elapsedSeconds,
+                verdict: 'VICTORY',
+                ratingDelta: 25,
+                correctnessScore: data.score.correctness,
+                speedScore: data.score.speed,
+                efficiencyScore: data.score.efficiency,
+                totalScore: data.score.total,
+                playedAt: 'Just now',
+              });
+              localStorage.setItem('codearena_battle_history', JSON.stringify(hist.slice(0, 50)));
+            } catch {}
           }
 
           setBattleCompleted(true);

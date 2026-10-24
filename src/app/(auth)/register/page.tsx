@@ -20,24 +20,26 @@ export default function RegisterPage() {
     setErrorMsg(null);
 
     try {
-      const supabase = createClient();
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            username,
-            avatar_url: `https://api.dicebear.com/7.x/bottts/svg?seed=${username}`,
-          },
-        },
+      // 1. Create and auto-verify combatant via server API
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, username }),
       });
 
-      if (error) throw error;
-
-      if (data.user && !data.session) {
-        setErrorMsg('Account created! Please check your email to confirm, or turn off "Confirm email" in Supabase Auth settings.');
-        return;
+      const resData = await res.json();
+      if (!res.ok) {
+        throw new Error(resData.error || 'Registration failed');
       }
+
+      // 2. Automatically sign in combatant to establish session
+      const supabase = createClient();
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (signInError) throw signInError;
 
       window.location.href = '/lobby';
     } catch (err: any) {

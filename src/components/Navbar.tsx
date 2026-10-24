@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Swords, Trophy, User, Plus, Target } from 'lucide-react';
+import { Swords, Trophy, User, Plus, Target, BarChart3 } from 'lucide-react';
 import { useUser } from '@/hooks/useUser';
 import { RatingBadge } from './RatingBadge';
 
@@ -14,6 +14,7 @@ export function Navbar() {
   const navLinks = [
     { href: '/lobby', label: 'LOBBY', icon: Swords },
     { href: '/practice', label: 'PRACTICE', icon: Target },
+    { href: '/analytics', label: 'ANALYTICS', icon: BarChart3 },
     { href: '/leaderboard', label: 'LEADERBOARD', icon: Trophy },
     { href: '/profile', label: 'PROFILE', icon: User },
   ];
@@ -48,7 +49,9 @@ export function Navbar() {
         <nav className="flex items-center gap-1 sm:gap-2 h-full">
           {navLinks.map((link) => {
             const Icon = link.icon;
-            const isActive = pathname === link.href;
+            const isActive =
+              pathname === link.href ||
+              (link.href !== '/' && pathname.startsWith(link.href));
             return (
               <Link
                 key={link.href}

@@ -203,7 +203,7 @@ function PracticeArenaContent({ params }: PracticePageProps) {
         if (data.score?.allPassed) {
           setIsCompleted(true);
 
-          // Save to completed drills
+          // Save to completed drills & practice logs
           try {
             const stored = localStorage.getItem('codearena_practice_completed');
             const list = stored ? JSON.parse(stored) : [];
@@ -211,6 +211,24 @@ function PracticeArenaContent({ params }: PracticePageProps) {
               list.push(problem.slug);
               localStorage.setItem('codearena_practice_completed', JSON.stringify(list));
             }
+
+            const logsStored = localStorage.getItem('codearena_practice_logs');
+            const logs = logsStored ? JSON.parse(logsStored) : [];
+            logs.unshift({
+              id: `drill-${Date.now()}`,
+              problemSlug: problem.slug,
+              problemTitle: problem.title,
+              difficulty: problem.difficulty,
+              language: SUPPORTED_LANGUAGES[language].name,
+              elapsedSeconds,
+              correctnessScore: data.score.correctness,
+              speedScore: data.score.speed,
+              efficiencyScore: data.score.efficiency,
+              totalScore: data.score.total,
+              botPaceBeaten: pacingBotEnabled,
+              completedAt: 'Just now',
+            });
+            localStorage.setItem('codearena_practice_logs', JSON.stringify(logs.slice(0, 50)));
           } catch {}
         }
       } else {

@@ -1,0 +1,847 @@
+[
+  {
+    "title": "Find Minimum in Rotated Sorted Array",
+    "slug": "find-minimum-in-rotated-sorted-array",
+    "difficulty": "medium",
+    "description": "Suppose an array of length `n` sorted in ascending order is rotated between `1` and `n` times. For example, the array `nums = [0,1,2,4,5,6,7]` might become `[4,5,6,7,0,1,2]`.\n\nGiven the sorted rotated array `nums` of unique elements, return the minimum element of this array.\n\nYou must write an algorithm that runs in **O(log n)** time.\n\n### Input Format\n- First line contains integer `N`, the number of elements.\n- Second line contains `N` space-separated integers representing `nums`.\n\n### Output Format\n- Print the single minimum integer in the array.",
+    "constraints": {
+      "time_limit_ms": 1000,
+      "memory_limit_kb": 64000
+    },
+    "sample_test_cases": [
+      {
+        "id": 1,
+        "input": "5\n3 4 5 1 2",
+        "expected_output": "1",
+        "is_hidden": false
+      },
+      {
+        "id": 2,
+        "input": "7\n4 5 6 7 0 1 2",
+        "expected_output": "0",
+        "is_hidden": false
+      }
+    ],
+    "hidden_test_cases": [
+      {
+        "id": 101,
+        "input": "4\n11 13 15 17",
+        "expected_output": "11",
+        "is_hidden": true
+      },
+      {
+        "id": 102,
+        "input": "1\n42",
+        "expected_output": "42",
+        "is_hidden": true
+      },
+      {
+        "id": 103,
+        "input": "2\n2 1",
+        "expected_output": "1",
+        "is_hidden": true
+      },
+      {
+        "id": 104,
+        "input": "6\n5 6 1 2 3 4",
+        "expected_output": "1",
+        "is_hidden": true
+      }
+    ],
+    "starter_code": {
+      "python": "import sys\n\ndef solve():\n    lines = sys.stdin.read().splitlines()\n    if not lines or len(lines) < 2: return\n    n = int(lines[0])\n    nums = list(map(int, lines[1].split()))\n    left, right = 0, n - 1\n    while left < right:\n        mid = (left + right) // 2\n        if nums[mid] > nums[right]:\n            left = mid + 1\n        else:\n            right = mid\n    print(nums[left])\n\nif __name__ == '__main__':\n    solve()\n",
+      "javascript": "const fs = require('fs');\n\nfunction solve() {\n    const lines = fs.readFileSync(0, 'utf-8').trim().split('\\n');\n    if (lines.length < 2) return;\n    const n = Number(lines[0]);\n    const nums = lines[1].trim().split(/\\s+/).map(Number);\n    let left = 0, right = n - 1;\n    while (left < right) {\n        const mid = Math.floor((left + right) / 2);\n        if (nums[mid] > nums[right]) {\n            left = mid + 1;\n        } else {\n            right = mid;\n        }\n    }\n    console.log(nums[left]);\n}\n\nsolve();\n",
+      "cpp": "#include <iostream>\n#include <vector>\nusing namespace std;\n\nint main() {\n    int n;\n    if (!(cin >> n)) return 0;\n    vector<int> nums(n);\n    for (int i = 0; i < n; i++) cin >> nums[i];\n    int left = 0, right = n - 1;\n    while (left < right) {\n        int mid = left + (right - left) / 2;\n        if (nums[mid] > nums[right]) left = mid + 1;\n        else right = mid;\n    }\n    cout << nums[left] << endl;\n    return 0;\n}\n",
+      "java": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if (!sc.hasNextInt()) return;\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for (int i = 0; i < n; i++) nums[i] = sc.nextInt();\n        int left = 0, right = n - 1;\n        while (left < right) {\n            int mid = left + (right - left) / 2;\n            if (nums[mid] > nums[right]) left = mid + 1;\n            else right = mid;\n        }\n        System.out.println(nums[left]);\n    }\n}\n",
+      "go": "package main\n\nimport (\n    \"bufio\"\n    \"fmt\"\n    \"os\"\n)\n\nfunc main() {\n    in := bufio.NewReader(os.Stdin)\n    var n int\n    if _, err := fmt.Fscan(in, &n); err != nil { return }\n    nums := make([]int, n)\n    for i := 0; i < n; i++ { fmt.Fscan(in, &nums[i]) }\n    left, right := 0, n - 1\n    for left < right {\n        mid := left + (right - left) / 2\n        if nums[mid] > nums[right] { left = mid + 1 } else { right = mid }\n    }\n    fmt.Println(nums[left])\n}\n"
+    },
+    "optimal_benchmarks": {
+      "python": {
+        "optimal_time_ms": 25,
+        "optimal_memory_kb": 4500
+      },
+      "javascript": {
+        "optimal_time_ms": 30,
+        "optimal_memory_kb": 5500
+      },
+      "cpp": {
+        "optimal_time_ms": 2,
+        "optimal_memory_kb": 1200
+      },
+      "java": {
+        "optimal_time_ms": 40,
+        "optimal_memory_kb": 12000
+      },
+      "go": {
+        "optimal_time_ms": 5,
+        "optimal_memory_kb": 2500
+      }
+    }
+  },
+  {
+    "title": "House Robber",
+    "slug": "house-robber",
+    "difficulty": "medium",
+    "description": "You are a professional robber planning to rob houses along a street. Each house has a certain amount of money stashed, the only constraint stopping you from robbing each of them is that adjacent houses have security systems connected and **it will automatically contact the police if two adjacent houses were broken into on the same night**.\n\nGiven an integer array `nums` representing the amount of money of each house, return the maximum amount of money you can rob tonight **without alerting the police**.\n\n### Input Format\n- First line contains integer `N`, number of houses.\n- Second line contains `N` space-separated integers representing the stash in each house.\n\n### Output Format\n- Print a single integer representing maximum loot.",
+    "constraints": {
+      "time_limit_ms": 1000,
+      "memory_limit_kb": 64000
+    },
+    "sample_test_cases": [
+      {
+        "id": 1,
+        "input": "4\n1 2 3 1",
+        "expected_output": "4",
+        "is_hidden": false
+      },
+      {
+        "id": 2,
+        "input": "5\n2 7 9 3 1",
+        "expected_output": "12",
+        "is_hidden": false
+      }
+    ],
+    "hidden_test_cases": [
+      {
+        "id": 101,
+        "input": "1\n100",
+        "expected_output": "100",
+        "is_hidden": true
+      },
+      {
+        "id": 102,
+        "input": "3\n2 1 1",
+        "expected_output": "2",
+        "is_hidden": true
+      },
+      {
+        "id": 103,
+        "input": "6\n5 1 1 5 1 5",
+        "expected_output": "15",
+        "is_hidden": true
+      },
+      {
+        "id": 104,
+        "input": "2\n1 2",
+        "expected_output": "2",
+        "is_hidden": true
+      }
+    ],
+    "starter_code": {
+      "python": "import sys\n\ndef solve():\n    lines = sys.stdin.read().splitlines()\n    if not lines or len(lines) < 2: return\n    n = int(lines[0])\n    nums = list(map(int, lines[1].split()))\n    prev1, prev2 = 0, 0\n    for num in nums:\n        prev1, prev2 = max(prev2 + num, prev1), prev1\n    print(prev1)\n\nif __name__ == '__main__':\n    solve()\n",
+      "javascript": "const fs = require('fs');\n\nfunction solve() {\n    const lines = fs.readFileSync(0, 'utf-8').trim().split('\\n');\n    if (lines.length < 2) return;\n    const n = Number(lines[0]);\n    const nums = lines[1].trim().split(/\\s+/).map(Number);\n    let prev1 = 0, prev2 = 0;\n    for (const num of nums) {\n        const temp = Math.max(prev2 + num, prev1);\n        prev2 = prev1;\n        prev1 = temp;\n    }\n    console.log(prev1);\n}\n\nsolve();\n",
+      "cpp": "#include <iostream>\n#include <vector>\n#include <algorithm>\nusing namespace std;\n\nint main() {\n    int n;\n    if (!(cin >> n)) return 0;\n    int prev1 = 0, prev2 = 0;\n    for (int i = 0; i < n; i++) {\n        int val; cin >> val;\n        int nextVal = max(prev2 + val, prev1);\n        prev2 = prev1;\n        prev1 = nextVal;\n    }\n    cout << prev1 << endl;\n    return 0;\n}\n",
+      "java": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if (!sc.hasNextInt()) return;\n        int n = sc.nextInt();\n        int prev1 = 0, prev2 = 0;\n        for (int i = 0; i < n; i++) {\n            int val = sc.nextInt();\n            int next = Math.max(prev2 + val, prev1);\n            prev2 = prev1;\n            prev1 = next;\n        }\n        System.out.println(prev1);\n    }\n}\n",
+      "go": "package main\n\nimport (\n    \"bufio\"\n    \"fmt\"\n    \"os\"\n)\n\nfunc max(a, b int) int {\n    if a > b { return a }; return b\n}\n\nfunc main() {\n    in := bufio.NewReader(os.Stdin)\n    var n int\n    if _, err := fmt.Fscan(in, &n); err != nil { return }\n    prev1, prev2 := 0, 0\n    for i := 0; i < n; i++ {\n        var val int\n        fmt.Fscan(in, &val)\n        nextVal := max(prev2 + val, prev1)\n        prev2 = prev1\n        prev1 = nextVal\n    }\n    fmt.Println(prev1)\n}\n"
+    },
+    "optimal_benchmarks": {
+      "python": {
+        "optimal_time_ms": 25,
+        "optimal_memory_kb": 4500
+      },
+      "javascript": {
+        "optimal_time_ms": 30,
+        "optimal_memory_kb": 5500
+      },
+      "cpp": {
+        "optimal_time_ms": 2,
+        "optimal_memory_kb": 1200
+      },
+      "java": {
+        "optimal_time_ms": 40,
+        "optimal_memory_kb": 12000
+      },
+      "go": {
+        "optimal_time_ms": 5,
+        "optimal_memory_kb": 2500
+      }
+    }
+  },
+  {
+    "title": "Jump Game",
+    "slug": "jump-game",
+    "difficulty": "medium",
+    "description": "You are given an integer array `nums`. You are initially positioned at the array's **first index**, and each element in the array represents your maximum jump length at that position.\n\nReturn `true` if you can reach the last index, or `false` otherwise.\n\n### Input Format\n- First line contains integer `N`.\n- Second line contains `N` space-separated integers representing jump capacities.\n\n### Output Format\n- Print `true` or `false`.",
+    "constraints": {
+      "time_limit_ms": 1000,
+      "memory_limit_kb": 64000
+    },
+    "sample_test_cases": [
+      {
+        "id": 1,
+        "input": "5\n2 3 1 1 4",
+        "expected_output": "true",
+        "is_hidden": false
+      },
+      {
+        "id": 2,
+        "input": "5\n3 2 1 0 4",
+        "expected_output": "false",
+        "is_hidden": false
+      }
+    ],
+    "hidden_test_cases": [
+      {
+        "id": 101,
+        "input": "1\n0",
+        "expected_output": "true",
+        "is_hidden": true
+      },
+      {
+        "id": 102,
+        "input": "3\n1 0 2",
+        "expected_output": "false",
+        "is_hidden": true
+      },
+      {
+        "id": 103,
+        "input": "4\n2 0 0 0",
+        "expected_output": "false",
+        "is_hidden": true
+      },
+      {
+        "id": 104,
+        "input": "5\n1 1 1 1 1",
+        "expected_output": "true",
+        "is_hidden": true
+      }
+    ],
+    "starter_code": {
+      "python": "import sys\n\ndef solve():\n    lines = sys.stdin.read().splitlines()\n    if not lines or len(lines) < 2: return\n    n = int(lines[0])\n    nums = list(map(int, lines[1].split()))\n    max_reach = 0\n    for i, jump in enumerate(nums):\n        if i > max_reach:\n            print(\"false\")\n            return\n        max_reach = max(max_reach, i + jump)\n        if max_reach >= n - 1:\n            print(\"true\")\n            return\n    print(\"true\" if max_reach >= n - 1 else \"false\")\n\nif __name__ == '__main__':\n    solve()\n",
+      "javascript": "const fs = require('fs');\n\nfunction solve() {\n    const lines = fs.readFileSync(0, 'utf-8').trim().split('\\n');\n    if (lines.length < 2) return;\n    const n = Number(lines[0]);\n    const nums = lines[1].trim().split(/\\s+/).map(Number);\n    let maxReach = 0;\n    for (let i = 0; i < n; i++) {\n        if (i > maxReach) {\n            console.log(\"false\");\n            return;\n        }\n        maxReach = Math.max(maxReach, i + nums[i]);\n        if (maxReach >= n - 1) {\n            console.log(\"true\");\n            return;\n        }\n    }\n    console.log(maxReach >= n - 1 ? \"true\" : \"false\");\n}\n\nsolve();\n",
+      "cpp": "#include <iostream>\n#include <vector>\n#include <algorithm>\nusing namespace std;\n\nint main() {\n    int n;\n    if (!(cin >> n)) return 0;\n    vector<int> nums(n);\n    for (int i = 0; i < n; i++) cin >> nums[i];\n    int maxReach = 0;\n    for (int i = 0; i < n; i++) {\n        if (i > maxReach) { cout << \"false\" << endl; return 0; }\n        maxReach = max(maxReach, i + nums[i]);\n        if (maxReach >= n - 1) { cout << \"true\" << endl; return 0; }\n    }\n    cout << (maxReach >= n - 1 ? \"true\" : \"false\") << endl;\n    return 0;\n}\n",
+      "java": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if (!sc.hasNextInt()) return;\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for (int i = 0; i < n; i++) nums[i] = sc.nextInt();\n        int maxReach = 0;\n        for (int i = 0; i < n; i++) {\n            if (i > maxReach) { System.out.println(\"false\"); return; }\n            maxReach = Math.max(maxReach, i + nums[i]);\n            if (maxReach >= n - 1) { System.out.println(\"true\"); return; }\n        }\n        System.out.println(maxReach >= n - 1 ? \"true\" : \"false\");\n    }\n}\n",
+      "go": "package main\n\nimport (\n    \"bufio\"\n    \"fmt\"\n    \"os\"\n)\n\nfunc max(a, b int) int {\n    if a > b { return a }; return b\n}\n\nfunc main() {\n    in := bufio.NewReader(os.Stdin)\n    var n int\n    if _, err := fmt.Fscan(in, &n); err != nil { return }\n    nums := make([]int, n)\n    for i := 0; i < n; i++ { fmt.Fscan(in, &nums[i]) }\n    maxReach := 0\n    for i := 0; i < n; i++ {\n        if i > maxReach { fmt.Println(\"false\"); return }\n        maxReach = max(maxReach, i + nums[i])\n        if maxReach >= n - 1 { fmt.Println(\"true\"); return }\n    }\n    if maxReach >= n - 1 { fmt.Println(\"true\") } else { fmt.Println(\"false\") }\n}\n"
+    },
+    "optimal_benchmarks": {
+      "python": {
+        "optimal_time_ms": 25,
+        "optimal_memory_kb": 4500
+      },
+      "javascript": {
+        "optimal_time_ms": 30,
+        "optimal_memory_kb": 5500
+      },
+      "cpp": {
+        "optimal_time_ms": 2,
+        "optimal_memory_kb": 1200
+      },
+      "java": {
+        "optimal_time_ms": 40,
+        "optimal_memory_kb": 12000
+      },
+      "go": {
+        "optimal_time_ms": 5,
+        "optimal_memory_kb": 2500
+      }
+    }
+  },
+  {
+    "title": "Unique Paths",
+    "slug": "unique-paths",
+    "difficulty": "medium",
+    "description": "There is a robot on an `m x n` grid. The robot is initially located at the **top-left corner** (`grid[0][0]`). The robot tries to move to the **bottom-right corner** (`grid[m - 1][n - 1]`). The robot can only move either down or right at any point in time.\n\nGiven the two integers `m` and `n`, return the number of possible unique paths that the robot can take to reach the bottom-right corner.\n\n### Input Format\n- A single line containing two space-separated integers `m` and `n`.\n\n### Output Format\n- Print a single integer representing the total unique paths.",
+    "constraints": {
+      "time_limit_ms": 1000,
+      "memory_limit_kb": 64000
+    },
+    "sample_test_cases": [
+      {
+        "id": 1,
+        "input": "3 7",
+        "expected_output": "28",
+        "is_hidden": false
+      },
+      {
+        "id": 2,
+        "input": "3 2",
+        "expected_output": "3",
+        "is_hidden": false
+      }
+    ],
+    "hidden_test_cases": [
+      {
+        "id": 101,
+        "input": "1 1",
+        "expected_output": "1",
+        "is_hidden": true
+      },
+      {
+        "id": 102,
+        "input": "2 2",
+        "expected_output": "2",
+        "is_hidden": true
+      },
+      {
+        "id": 103,
+        "input": "7 3",
+        "expected_output": "28",
+        "is_hidden": true
+      },
+      {
+        "id": 104,
+        "input": "10 10",
+        "expected_output": "48620",
+        "is_hidden": true
+      }
+    ],
+    "starter_code": {
+      "python": "import sys\nimport math\n\ndef solve():\n    raw = sys.stdin.read().strip()\n    if not raw: return\n    m, n = map(int, raw.split())\n    # Combinations (m + n - 2) choose (m - 1)\n    ans = math.comb(m + n - 2, m - 1)\n    print(ans)\n\nif __name__ == '__main__':\n    solve()\n",
+      "javascript": "const fs = require('fs');\n\nfunction solve() {\n    const raw = fs.readFileSync(0, 'utf-8').trim();\n    if (!raw) return;\n    const [m, n] = raw.split(/\\s+/).map(Number);\n    const row = new Array(n).fill(1);\n    for (let i = 1; i < m; i++) {\n        for (let j = 1; j < n; j++) {\n            row[j] += row[j - 1];\n        }\n    }\n    console.log(row[n - 1]);\n}\n\nsolve();\n",
+      "cpp": "#include <iostream>\n#include <vector>\nusing namespace std;\n\nint main() {\n    int m, n;\n    if (!(cin >> m >> n)) return 0;\n    vector<long long> row(n, 1);\n    for (int i = 1; i < m; i++) {\n        for (int j = 1; j < n; j++) {\n            row[j] += row[j - 1];\n        }\n    }\n    cout << row[n - 1] << endl;\n    return 0;\n}\n",
+      "java": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if (!sc.hasNextInt()) return;\n        int m = sc.nextInt();\n        int n = sc.nextInt();\n        long[] row = new long[n];\n        Arrays.fill(row, 1);\n        for (int i = 1; i < m; i++) {\n            for (int j = 1; j < n; j++) {\n                row[j] += row[j - 1];\n            }\n        }\n        System.out.println(row[n - 1]);\n    }\n}\n",
+      "go": "package main\n\nimport (\n    \"fmt\"\n)\n\nfunc main() {\n    var m, n int\n    if _, err := fmt.Scan(&m, &n); err != nil { return }\n    row := make([]int64, n)\n    for j := 0; j < n; j++ { row[j] = 1 }\n    for i := 1; i < m; i++ {\n        for j := 1; j < n; j++ {\n            row[j] += row[j - 1]\n        }\n    }\n    fmt.Println(row[n - 1])\n}\n"
+    },
+    "optimal_benchmarks": {
+      "python": {
+        "optimal_time_ms": 25,
+        "optimal_memory_kb": 4500
+      },
+      "javascript": {
+        "optimal_time_ms": 30,
+        "optimal_memory_kb": 5500
+      },
+      "cpp": {
+        "optimal_time_ms": 2,
+        "optimal_memory_kb": 1200
+      },
+      "java": {
+        "optimal_time_ms": 40,
+        "optimal_memory_kb": 12000
+      },
+      "go": {
+        "optimal_time_ms": 5,
+        "optimal_memory_kb": 2500
+      }
+    }
+  },
+  {
+    "title": "Trapping Rain Water",
+    "slug": "trapping-rain-water",
+    "difficulty": "hard",
+    "description": "Given `n` non-negative integers representing an elevation map where the width of each bar is `1`, compute how much water it can trap after raining.\n\n### Input Format\n- First line contains integer `N`, number of bars.\n- Second line contains `N` space-separated non-negative integers representing heights.\n\n### Output Format\n- Print a single integer representing total trapped rain water units.",
+    "constraints": {
+      "time_limit_ms": 1000,
+      "memory_limit_kb": 64000
+    },
+    "sample_test_cases": [
+      {
+        "id": 1,
+        "input": "12\n0 1 0 2 1 0 1 3 2 1 2 1",
+        "expected_output": "6",
+        "is_hidden": false
+      },
+      {
+        "id": 2,
+        "input": "6\n4 2 0 3 2 5",
+        "expected_output": "9",
+        "is_hidden": false
+      }
+    ],
+    "hidden_test_cases": [
+      {
+        "id": 101,
+        "input": "3\n3 0 2",
+        "expected_output": "2",
+        "is_hidden": true
+      },
+      {
+        "id": 102,
+        "input": "1\n5",
+        "expected_output": "0",
+        "is_hidden": true
+      },
+      {
+        "id": 103,
+        "input": "5\n1 2 3 4 5",
+        "expected_output": "0",
+        "is_hidden": true
+      },
+      {
+        "id": 104,
+        "input": "5\n5 4 3 2 1",
+        "expected_output": "0",
+        "is_hidden": true
+      }
+    ],
+    "starter_code": {
+      "python": "import sys\n\ndef solve():\n    lines = sys.stdin.read().splitlines()\n    if not lines or len(lines) < 2: return\n    n = int(lines[0])\n    height = list(map(int, lines[1].split()))\n    if n < 3:\n        print(0)\n        return\n    left, right = 0, n - 1\n    left_max, right_max = height[left], height[right]\n    water = 0\n    while left < right:\n        if left_max < right_max:\n            left += 1\n            left_max = max(left_max, height[left])\n            water += left_max - height[left]\n        else:\n            right -= 1\n            right_max = max(right_max, height[right])\n            water += right_max - height[right]\n    print(water)\n\nif __name__ == '__main__':\n    solve()\n",
+      "javascript": "const fs = require('fs');\n\nfunction solve() {\n    const lines = fs.readFileSync(0, 'utf-8').trim().split('\\n');\n    if (lines.length < 2) return;\n    const n = Number(lines[0]);\n    const height = lines[1].trim().split(/\\s+/).map(Number);\n    if (n < 3) { console.log(0); return; }\n    let left = 0, right = n - 1;\n    let leftMax = height[left], rightMax = height[right];\n    let water = 0;\n    while (left < right) {\n        if (leftMax < rightMax) {\n            left++;\n            leftMax = Math.max(leftMax, height[left]);\n            water += leftMax - height[left];\n        } else {\n            right--;\n            rightMax = Math.max(rightMax, height[right]);\n            water += rightMax - height[right];\n        }\n    }\n    console.log(water);\n}\n\nsolve();\n",
+      "cpp": "#include <iostream>\n#include <vector>\n#include <algorithm>\nusing namespace std;\n\nint main() {\n    int n;\n    if (!(cin >> n)) return 0;\n    vector<int> height(n);\n    for (int i = 0; i < n; i++) cin >> height[i];\n    if (n < 3) { cout << 0 << endl; return 0; }\n    int left = 0, right = n - 1;\n    int leftMax = height[left], rightMax = height[right];\n    long long water = 0;\n    while (left < right) {\n        if (leftMax < rightMax) {\n            left++;\n            leftMax = max(leftMax, height[left]);\n            water += leftMax - height[left];\n        } else {\n            right--;\n            rightMax = max(rightMax, height[right]);\n            water += rightMax - height[right];\n        }\n    }\n    cout << water << endl;\n    return 0;\n}\n",
+      "java": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if (!sc.hasNextInt()) return;\n        int n = sc.nextInt();\n        int[] height = new int[n];\n        for (int i = 0; i < n; i++) height[i] = sc.nextInt();\n        if (n < 3) { System.out.println(0); return; }\n        int left = 0, right = n - 1;\n        int leftMax = height[left], rightMax = height[right];\n        long water = 0;\n        while (left < right) {\n            if (leftMax < rightMax) {\n                left++;\n                leftMax = Math.max(leftMax, height[left]);\n                water += leftMax - height[left];\n            } else {\n                right--;\n                rightMax = Math.max(rightMax, height[right]);\n                water += rightMax - height[right];\n            }\n        }\n        System.out.println(water);\n    }\n}\n",
+      "go": "package main\n\nimport (\n    \"bufio\"\n    \"fmt\"\n    \"os\"\n)\n\nfunc max(a, b int) int {\n    if a > b { return a }; return b\n}\n\nfunc main() {\n    in := bufio.NewReader(os.Stdin)\n    var n int\n    if _, err := fmt.Fscan(in, &n); err != nil { return }\n    height := make([]int, n)\n    for i := 0; i < n; i++ { fmt.Fscan(in, &height[i]) }\n    if n < 3 { fmt.Println(0); return }\n    left, right := 0, n - 1\n    leftMax, rightMax := height[left], height[right]\n    water := 0\n    for left < right {\n        if leftMax < rightMax {\n            left++\n            leftMax = max(leftMax, height[left])\n            water += leftMax - height[left]\n        } else {\n            right--\n            rightMax = max(rightMax, height[right])\n            water += rightMax - height[right]\n        }\n    }\n    fmt.Println(water)\n}\n"
+    },
+    "optimal_benchmarks": {
+      "python": {
+        "optimal_time_ms": 25,
+        "optimal_memory_kb": 4500
+      },
+      "javascript": {
+        "optimal_time_ms": 30,
+        "optimal_memory_kb": 5500
+      },
+      "cpp": {
+        "optimal_time_ms": 2,
+        "optimal_memory_kb": 1200
+      },
+      "java": {
+        "optimal_time_ms": 40,
+        "optimal_memory_kb": 12000
+      },
+      "go": {
+        "optimal_time_ms": 5,
+        "optimal_memory_kb": 2500
+      }
+    }
+  },
+  {
+    "title": "Number of 1 Bits",
+    "slug": "number-of-1-bits",
+    "difficulty": "easy",
+    "description": "Given a positive integer `n`, write a function that returns the number of set bits (1s) it has in its binary representation (also known as the **Hamming weight**).\n\n### Input Format\n- A single positive integer `n`.\n\n### Output Format\n- Print the count of 1 bits.",
+    "constraints": {
+      "time_limit_ms": 1000,
+      "memory_limit_kb": 64000
+    },
+    "sample_test_cases": [
+      {
+        "id": 1,
+        "input": "11",
+        "expected_output": "3",
+        "is_hidden": false
+      },
+      {
+        "id": 2,
+        "input": "128",
+        "expected_output": "1",
+        "is_hidden": false
+      }
+    ],
+    "hidden_test_cases": [
+      {
+        "id": 101,
+        "input": "0",
+        "expected_output": "0",
+        "is_hidden": true
+      },
+      {
+        "id": 102,
+        "input": "2147483645",
+        "expected_output": "30",
+        "is_hidden": true
+      },
+      {
+        "id": 103,
+        "input": "255",
+        "expected_output": "8",
+        "is_hidden": true
+      }
+    ],
+    "starter_code": {
+      "python": "import sys\n\ndef solve():\n    raw = sys.stdin.read().strip()\n    if not raw: return\n    n = int(raw)\n    count = 0\n    while n > 0:\n        n &= (n - 1)\n        count += 1\n    print(count)\n\nif __name__ == '__main__':\n    solve()\n",
+      "javascript": "const fs = require('fs');\n\nfunction solve() {\n    const raw = fs.readFileSync(0, 'utf-8').trim();\n    if (!raw) return;\n    let n = BigInt(raw);\n    let count = 0;\n    while (n > 0n) {\n        n &= (n - 1n);\n        count++;\n    }\n    console.log(count);\n}\n\nsolve();\n",
+      "cpp": "#include <iostream>\nusing namespace std;\n\nint main() {\n    long long n;\n    if (!(cin >> n)) return 0;\n    int count = 0;\n    while (n > 0) {\n        n &= (n - 1);\n        count++;\n    }\n    cout << count << endl;\n    return 0;\n}\n",
+      "java": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if (!sc.hasNextLong()) return;\n        long n = sc.nextLong();\n        int count = 0;\n        while (n > 0) {\n            n &= (n - 1);\n            count++;\n        }\n        System.out.println(count);\n    }\n}\n",
+      "go": "package main\n\nimport (\n    \"fmt\"\n)\n\nfunc main() {\n    var n uint64\n    if _, err := fmt.Scan(&n); err != nil { return }\n    count := 0\n    for n > 0 {\n        n &= (n - 1)\n        count++\n    }\n    fmt.Println(count)\n}\n"
+    },
+    "optimal_benchmarks": {
+      "python": {
+        "optimal_time_ms": 25,
+        "optimal_memory_kb": 4500
+      },
+      "javascript": {
+        "optimal_time_ms": 30,
+        "optimal_memory_kb": 5500
+      },
+      "cpp": {
+        "optimal_time_ms": 2,
+        "optimal_memory_kb": 1200
+      },
+      "java": {
+        "optimal_time_ms": 40,
+        "optimal_memory_kb": 12000
+      },
+      "go": {
+        "optimal_time_ms": 5,
+        "optimal_memory_kb": 2500
+      }
+    }
+  },
+  {
+    "title": "Counting Bits",
+    "slug": "counting-bits",
+    "difficulty": "easy",
+    "description": "Given an integer `n`, return an array `ans` of length `n + 1` such that for each `i` (`0 <= i <= n`), `ans[i]` is the **number of 1's** in the binary representation of `i`.\n\n### Input Format\n- A single integer `n`.\n\n### Output Format\n- Print `n + 1` space-separated integers.",
+    "constraints": {
+      "time_limit_ms": 1000,
+      "memory_limit_kb": 64000
+    },
+    "sample_test_cases": [
+      {
+        "id": 1,
+        "input": "2",
+        "expected_output": "0 1 1",
+        "is_hidden": false
+      },
+      {
+        "id": 2,
+        "input": "5",
+        "expected_output": "0 1 1 2 1 2",
+        "is_hidden": false
+      }
+    ],
+    "hidden_test_cases": [
+      {
+        "id": 101,
+        "input": "0",
+        "expected_output": "0",
+        "is_hidden": true
+      },
+      {
+        "id": 102,
+        "input": "8",
+        "expected_output": "0 1 1 2 1 2 2 3 1",
+        "is_hidden": true
+      },
+      {
+        "id": 103,
+        "input": "1",
+        "expected_output": "0 1",
+        "is_hidden": true
+      }
+    ],
+    "starter_code": {
+      "python": "import sys\n\ndef solve():\n    raw = sys.stdin.read().strip()\n    if not raw: return\n    n = int(raw)\n    ans = [0] * (n + 1)\n    for i in range(1, n + 1):\n        ans[i] = ans[i >> 1] + (i & 1)\n    print(\" \".join(map(str, ans)))\n\nif __name__ == '__main__':\n    solve()\n",
+      "javascript": "const fs = require('fs');\n\nfunction solve() {\n    const raw = fs.readFileSync(0, 'utf-8').trim();\n    if (!raw) return;\n    const n = Number(raw);\n    const ans = new Array(n + 1).fill(0);\n    for (let i = 1; i <= n; i++) {\n        ans[i] = ans[i >> 1] + (i & 1);\n    }\n    console.log(ans.join(' '));\n}\n\nsolve();\n",
+      "cpp": "#include <iostream>\n#include <vector>\nusing namespace std;\n\nint main() {\n    int n;\n    if (!(cin >> n)) return 0;\n    vector<int> ans(n + 1, 0);\n    for (int i = 1; i <= n; i++) {\n        ans[i] = ans[i >> 1] + (i & 1);\n    }\n    for (int i = 0; i <= n; i++) {\n        cout << ans[i] << (i == n ? \"\" : \" \");\n    }\n    cout << endl;\n    return 0;\n}\n",
+      "java": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if (!sc.hasNextInt()) return;\n        int n = sc.nextInt();\n        int[] ans = new int[n + 1];\n        StringBuilder sb = new StringBuilder();\n        for (int i = 1; i <= n; i++) {\n            ans[i] = ans[i >> 1] + (i & 1);\n        }\n        for (int i = 0; i <= n; i++) {\n            sb.append(ans[i]).append(i == n ? \"\" : \" \");\n        }\n        System.out.println(sb.toString());\n    }\n}\n",
+      "go": "package main\n\nimport (\n    \"bufio\"\n    \"fmt\"\n    \"os\"\n)\n\nfunc main() {\n    var n int\n    if _, err := fmt.Scan(&n); err != nil { return }\n    ans := make([]int, n + 1)\n    out := bufio.NewWriter(os.Stdout)\n    defer out.Flush()\n    for i := 1; i <= n; i++ {\n        ans[i] = ans[i >> 1] + (i & 1)\n    }\n    for i := 0; i <= n; i++ {\n        if i > 0 { fmt.Fprint(out, \" \") }\n        fmt.Fprint(out, ans[i])\n    }\n    fmt.Fprintln(out)\n}\n"
+    },
+    "optimal_benchmarks": {
+      "python": {
+        "optimal_time_ms": 25,
+        "optimal_memory_kb": 4500
+      },
+      "javascript": {
+        "optimal_time_ms": 30,
+        "optimal_memory_kb": 5500
+      },
+      "cpp": {
+        "optimal_time_ms": 2,
+        "optimal_memory_kb": 1200
+      },
+      "java": {
+        "optimal_time_ms": 40,
+        "optimal_memory_kb": 12000
+      },
+      "go": {
+        "optimal_time_ms": 5,
+        "optimal_memory_kb": 2500
+      }
+    }
+  },
+  {
+    "title": "Longest Palindromic Substring",
+    "slug": "longest-palindromic-substring",
+    "difficulty": "medium",
+    "description": "Given a string `s`, return the longest palindromic substring in `s`.\n\nIf there are multiple palindromic substrings of the same maximum length, return the one that occurs earliest.\n\n### Input Format\n- A single line containing string `s`.\n\n### Output Format\n- Print the longest palindromic substring.",
+    "constraints": {
+      "time_limit_ms": 1000,
+      "memory_limit_kb": 64000
+    },
+    "sample_test_cases": [
+      {
+        "id": 1,
+        "input": "babad",
+        "expected_output": "bab",
+        "is_hidden": false
+      },
+      {
+        "id": 2,
+        "input": "cbbd",
+        "expected_output": "bb",
+        "is_hidden": false
+      }
+    ],
+    "hidden_test_cases": [
+      {
+        "id": 101,
+        "input": "a",
+        "expected_output": "a",
+        "is_hidden": true
+      },
+      {
+        "id": 102,
+        "input": "racecar",
+        "expected_output": "racecar",
+        "is_hidden": true
+      },
+      {
+        "id": 103,
+        "input": "ac",
+        "expected_output": "a",
+        "is_hidden": true
+      },
+      {
+        "id": 104,
+        "input": "forgeeksskeegfor",
+        "expected_output": "geeksskeeg",
+        "is_hidden": true
+      }
+    ],
+    "starter_code": {
+      "python": "import sys\n\ndef solve():\n    s = sys.stdin.read().strip()\n    if not s: return\n    res = \"\"\n    for i in range(len(s)):\n        # Odd length\n        l, r = i, i\n        while l >= 0 and r < len(s) and s[l] == s[r]:\n            if (r - l + 1) > len(res):\n                res = s[l:r+1]\n            l -= 1\n            r += 1\n        # Even length\n        l, r = i, i + 1\n        while l >= 0 and r < len(s) and s[l] == s[r]:\n            if (r - l + 1) > len(res):\n                res = s[l:r+1]\n            l -= 1\n            r += 1\n    print(res)\n\nif __name__ == '__main__':\n    solve()\n",
+      "javascript": "const fs = require('fs');\n\nfunction solve() {\n    const s = fs.readFileSync(0, 'utf-8').trim();\n    if (!s) return;\n    let res = \"\";\n    for (let i = 0; i < s.length; i++) {\n        // Odd\n        let l = i, r = i;\n        while (l >= 0 && r < s.length && s[l] === s[r]) {\n            if ((r - l + 1) > res.length) res = s.substring(l, r + 1);\n            l--; r++;\n        }\n        // Even\n        l = i; r = i + 1;\n        while (l >= 0 && r < s.length && s[l] === s[r]) {\n            if ((r - l + 1) > res.length) res = s.substring(l, r + 1);\n            l--; r++;\n        }\n    }\n    console.log(res);\n}\n\nsolve();\n",
+      "cpp": "#include <iostream>\n#include <string>\nusing namespace std;\n\nint main() {\n    string s;\n    if (!(cin >> s)) return 0;\n    string res = \"\";\n    int n = s.length();\n    for (int i = 0; i < n; i++) {\n        int l = i, r = i;\n        while (l >= 0 && r < n && s[l] == s[r]) {\n            if (r - l + 1 > (int)res.length()) res = s.substr(l, r - l + 1);\n            l--; r++;\n        }\n        l = i; r = i + 1;\n        while (l >= 0 && r < n && s[l] == s[r]) {\n            if (r - l + 1 > (int)res.length()) res = s.substr(l, r - l + 1);\n            l--; r++;\n        }\n    }\n    cout << res << endl;\n    return 0;\n}\n",
+      "java": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if (!sc.hasNext()) return;\n        String s = sc.next();\n        String res = \"\";\n        int n = s.length();\n        for (int i = 0; i < n; i++) {\n            int l = i, r = i;\n            while (l >= 0 && r < n && s.charAt(l) == s.charAt(r)) {\n                if (r - l + 1 > res.length()) res = s.substring(l, r + 1);\n                l--; r++;\n            }\n            l = i; r = i + 1;\n            while (l >= 0 && r < n && s.charAt(l) == s.charAt(r)) {\n                if (r - l + 1 > res.length()) res = s.substring(l, r + 1);\n                l--; r++;\n            }\n        }\n        System.out.println(res);\n    }\n}\n",
+      "go": "package main\n\nimport (\n    \"fmt\"\n)\n\nfunc main() {\n    var s string\n    if _, err := fmt.Scan(&s); err != nil { return }\n    res := \"\"\n    n := len(s)\n    for i := 0; i < n; i++ {\n        l, r := i, i\n        for l >= 0 && r < n && s[l] == s[r] {\n            if r - l + 1 > len(res) { res = s[l:r+1] }\n            l--; r++\n        }\n        l, r = i, i + 1\n        for l >= 0 && r < n && s[l] == s[r] {\n            if r - l + 1 > len(res) { res = s[l:r+1] }\n            l--; r++\n        }\n    }\n    fmt.Println(res)\n}\n"
+    },
+    "optimal_benchmarks": {
+      "python": {
+        "optimal_time_ms": 25,
+        "optimal_memory_kb": 4500
+      },
+      "javascript": {
+        "optimal_time_ms": 30,
+        "optimal_memory_kb": 5500
+      },
+      "cpp": {
+        "optimal_time_ms": 2,
+        "optimal_memory_kb": 1200
+      },
+      "java": {
+        "optimal_time_ms": 40,
+        "optimal_memory_kb": 12000
+      },
+      "go": {
+        "optimal_time_ms": 5,
+        "optimal_memory_kb": 2500
+      }
+    }
+  },
+  {
+    "title": "Top K Frequent Elements",
+    "slug": "top-k-frequent-elements",
+    "difficulty": "medium",
+    "description": "Given an integer array `nums` and an integer `k`, return the `k` most frequent elements.\n\nPrint the `k` elements separated by a space in ascending order.\n\n### Input Format\n- First line contains integer `N`, number of elements.\n- Second line contains `N` space-separated integers representing `nums`.\n- Third line contains integer `k`.\n\n### Output Format\n- Print `k` space-separated integers in ascending numerical order.",
+    "constraints": {
+      "time_limit_ms": 1000,
+      "memory_limit_kb": 64000
+    },
+    "sample_test_cases": [
+      {
+        "id": 1,
+        "input": "6\n1 1 1 2 2 3\n2",
+        "expected_output": "1 2",
+        "is_hidden": false
+      },
+      {
+        "id": 2,
+        "input": "1\n1\n1",
+        "expected_output": "1",
+        "is_hidden": false
+      }
+    ],
+    "hidden_test_cases": [
+      {
+        "id": 101,
+        "input": "4\n4 4 4 4\n1",
+        "expected_output": "4",
+        "is_hidden": true
+      },
+      {
+        "id": 102,
+        "input": "6\n1 2 2 3 3 3\n2",
+        "expected_output": "2 3",
+        "is_hidden": true
+      },
+      {
+        "id": 103,
+        "input": "7\n-1 -1 2 2 2 3 3\n2",
+        "expected_output": "-1 2",
+        "is_hidden": true
+      }
+    ],
+    "starter_code": {
+      "python": "import sys\nfrom collections import Counter\n\ndef solve():\n    lines = sys.stdin.read().splitlines()\n    if not lines or len(lines) < 3: return\n    n = int(lines[0])\n    nums = list(map(int, lines[1].split()))\n    k = int(lines[2])\n    counts = Counter(nums)\n    most_common = [val for val, _ in counts.most_common(k)]\n    most_common.sort()\n    print(\" \".join(map(str, most_common)))\n\nif __name__ == '__main__':\n    solve()\n",
+      "javascript": "const fs = require('fs');\n\nfunction solve() {\n    const lines = fs.readFileSync(0, 'utf-8').trim().split('\\n');\n    if (lines.length < 3) return;\n    const nums = lines[1].trim().split(/\\s+/).map(Number);\n    const k = Number(lines[2]);\n    const freq = new Map();\n    for (const num of nums) freq.set(num, (freq.get(num) || 0) + 1);\n    const sorted = [...freq.entries()].sort((a, b) => b[1] - a[1]);\n    const topK = sorted.slice(0, k).map(entry => entry[0]).sort((a, b) => a - b);\n    console.log(topK.join(' '));\n}\n\nsolve();\n",
+      "cpp": "#include <iostream>\n#include <vector>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nint main() {\n    int n;\n    if (!(cin >> n)) return 0;\n    unordered_map<int, int> count;\n    for (int i = 0; i < n; i++) {\n        int x; cin >> x;\n        count[x]++;\n    }\n    int k; cin >> k;\n    vector<pair<int, int>> freq;\n    for (auto& p : count) freq.push_back({p.second, p.first});\n    sort(freq.rbegin(), freq.rend());\n    vector<int> res;\n    for (int i = 0; i < k; i++) res.push_back(freq[i].second);\n    sort(res.begin(), res.end());\n    for (int i = 0; i < k; i++) cout << res[i] << (i == k - 1 ? \"\" : \" \");\n    cout << endl;\n    return 0;\n}\n",
+      "java": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if (!sc.hasNextInt()) return;\n        int n = sc.nextInt();\n        Map<Integer, Integer> map = new HashMap<>();\n        for (int i = 0; i < n; i++) {\n            int x = sc.nextInt();\n            map.put(x, map.getOrDefault(x, 0) + 1);\n        }\n        int k = sc.nextInt();\n        List<Map.Entry<Integer, Integer>> list = new ArrayList<>(map.entrySet());\n        list.sort((a, b) -> b.getValue() - a.getValue());\n        List<Integer> res = new ArrayList<>();\n        for (int i = 0; i < k; i++) res.add(list.get(i).getKey());\n        Collections.sort(res);\n        for (int i = 0; i < k; i++) {\n            System.out.print(res.get(i) + (i == k - 1 ? \"\" : \" \"));\n        }\n        System.out.println();\n    }\n}\n",
+      "go": "package main\n\nimport (\n    \"bufio\"\n    \"fmt\"\n    \"os\"\n    \"sort\"\n)\n\nfunc main() {\n    in := bufio.NewReader(os.Stdin)\n    var n int\n    if _, err := fmt.Fscan(in, &n); err != nil { return }\n    counts := make(map[int]int)\n    for i := 0; i < n; i++ {\n        var x int\n        fmt.Fscan(in, &x)\n        counts[x]++\n    }\n    var k int\n    fmt.Fscan(in, &k)\n    type pair struct{ val, count int }\n    var list []pair\n    for v, c := range counts { list = append(list, pair{v, c}) }\n    sort.Slice(list, func(i, j int) bool { return list[i].count > list[j].count })\n    var res []int\n    for i := 0; i < k; i++ { res = append(res, list[i].val) }\n    sort.Ints(res)\n    for i := 0; i < k; i++ {\n        if i > 0 { fmt.Print(\" \") }\n        fmt.Print(res[i])\n    }\n    fmt.Println()\n}\n"
+    },
+    "optimal_benchmarks": {
+      "python": {
+        "optimal_time_ms": 25,
+        "optimal_memory_kb": 4500
+      },
+      "javascript": {
+        "optimal_time_ms": 30,
+        "optimal_memory_kb": 5500
+      },
+      "cpp": {
+        "optimal_time_ms": 2,
+        "optimal_memory_kb": 1200
+      },
+      "java": {
+        "optimal_time_ms": 40,
+        "optimal_memory_kb": 12000
+      },
+      "go": {
+        "optimal_time_ms": 5,
+        "optimal_memory_kb": 2500
+      }
+    }
+  },
+  {
+    "title": "Word Break",
+    "slug": "word-break",
+    "difficulty": "medium",
+    "description": "Given a string `s` and a dictionary of strings `wordDict`, return `true` if `s` can be segmented into a space-separated sequence of one or more dictionary words.\n\nNote that the same word in the dictionary may be reused multiple times in the segmentation.\n\n### Input Format\n- First line contains string `s`.\n- Second line contains integer `N`, number of dictionary words.\n- Third line contains `N` space-separated words.\n\n### Output Format\n- Print `true` or `false`.",
+    "constraints": {
+      "time_limit_ms": 1000,
+      "memory_limit_kb": 64000
+    },
+    "sample_test_cases": [
+      {
+        "id": 1,
+        "input": "leetcode\n2\nleet code",
+        "expected_output": "true",
+        "is_hidden": false
+      },
+      {
+        "id": 2,
+        "input": "applepenapple\n2\napple pen",
+        "expected_output": "true",
+        "is_hidden": false
+      },
+      {
+        "id": 3,
+        "input": "catsandog\n5\ncats dog sand and cat",
+        "expected_output": "false",
+        "is_hidden": false
+      }
+    ],
+    "hidden_test_cases": [
+      {
+        "id": 101,
+        "input": "cars\n2\ncar ca",
+        "expected_output": "false",
+        "is_hidden": true
+      },
+      {
+        "id": 102,
+        "input": "a\n1\na",
+        "expected_output": "true",
+        "is_hidden": true
+      },
+      {
+        "id": 103,
+        "input": "bb\n3\na b bbb",
+        "expected_output": "true",
+        "is_hidden": true
+      }
+    ],
+    "starter_code": {
+      "python": "import sys\n\ndef solve():\n    lines = sys.stdin.read().splitlines()\n    if not lines or len(lines) < 3: return\n    s = lines[0].strip()\n    words = set(lines[2].split())\n    dp = [False] * (len(s) + 1)\n    dp[0] = True\n    for i in range(1, len(s) + 1):\n        for j in range(i):\n            if dp[j] and s[j:i] in words:\n                dp[i] = True\n                break\n    print(\"true\" if dp[len(s)] else \"false\")\n\nif __name__ == '__main__':\n    solve()\n",
+      "javascript": "const fs = require('fs');\n\nfunction solve() {\n    const lines = fs.readFileSync(0, 'utf-8').trim().split('\\n');\n    if (lines.length < 3) return;\n    const s = lines[0].trim();\n    const words = new Set(lines[2].trim().split(/\\s+/));\n    const dp = new Array(s.length + 1).fill(false);\n    dp[0] = true;\n    for (let i = 1; i <= s.length; i++) {\n        for (let j = 0; j < i; j++) {\n            if (dp[j] && words.has(s.substring(j, i))) {\n                dp[i] = true;\n                break;\n            }\n        }\n    }\n    console.log(dp[s.length] ? \"true\" : \"false\");\n}\n\nsolve();\n",
+      "cpp": "#include <iostream>\n#include <vector>\n#include <string>\n#include <unordered_set>\nusing namespace std;\n\nint main() {\n    string s;\n    if (!(cin >> s)) return 0;\n    int n; cin >> n;\n    unordered_set<string> dict;\n    for (int i = 0; i < n; i++) {\n        string w; cin >> w;\n        dict.insert(w);\n    }\n    int len = s.length();\n    vector<bool> dp(len + 1, false);\n    dp[0] = true;\n    for (int i = 1; i <= len; i++) {\n        for (int j = 0; j < i; j++) {\n            if (dp[j] && dict.count(s.substr(j, i - j))) {\n                dp[i] = true;\n                break;\n            }\n        }\n    }\n    cout << (dp[len] ? \"true\" : \"false\") << endl;\n    return 0;\n}\n",
+      "java": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if (!sc.hasNext()) return;\n        String s = sc.next();\n        int n = sc.nextInt();\n        Set<String> set = new HashSet<>();\n        for (int i = 0; i < n; i++) set.add(sc.next());\n        boolean[] dp = new boolean[s.length() + 1];\n        dp[0] = true;\n        for (int i = 1; i <= s.length(); i++) {\n            for (int j = 0; j < i; j++) {\n                if (dp[j] && set.contains(s.substring(j, i))) {\n                    dp[i] = true;\n                    break;\n                }\n            }\n        }\n        System.out.println(dp[s.length()] ? \"true\" : \"false\");\n    }\n}\n",
+      "go": "package main\n\nimport (\n    \"bufio\"\n    \"fmt\"\n    \"os\"\n)\n\nfunc main() {\n    in := bufio.NewReader(os.Stdin)\n    var s string\n    if _, err := fmt.Fscan(in, &s); err != nil { return }\n    var n int\n    fmt.Fscan(in, &n)\n    dict := make(map[string]bool)\n    for i := 0; i < n; i++ {\n        var w string\n        fmt.Fscan(in, &w)\n        dict[w] = true\n    }\n    dp := make([]bool, len(s)+1)\n    dp[0] = true\n    for i := 1; i <= len(s); i++ {\n        for j := 0; j < i; j++ {\n            if dp[j] && dict[s[j:i]] {\n                dp[i] = true\n                break\n            }\n        }\n    }\n    if dp[len(s)] { fmt.Println(\"true\") } else { fmt.Println(\"false\") }\n}\n"
+    },
+    "optimal_benchmarks": {
+      "python": {
+        "optimal_time_ms": 25,
+        "optimal_memory_kb": 4500
+      },
+      "javascript": {
+        "optimal_time_ms": 30,
+        "optimal_memory_kb": 5500
+      },
+      "cpp": {
+        "optimal_time_ms": 2,
+        "optimal_memory_kb": 1200
+      },
+      "java": {
+        "optimal_time_ms": 40,
+        "optimal_memory_kb": 12000
+      },
+      "go": {
+        "optimal_time_ms": 5,
+        "optimal_memory_kb": 2500
+      }
+    }
+  },
+  {
+    "title": "Reverse Bits",
+    "slug": "reverse-bits",
+    "difficulty": "easy",
+    "description": "Reverse bits of a given 32 bits unsigned integer.\n\n### Input Format\n- A single unsigned 32-bit integer `n`.\n\n### Output Format\n- Print the integer resulting from reversing the binary bits.",
+    "constraints": {
+      "time_limit_ms": 1000,
+      "memory_limit_kb": 64000
+    },
+    "sample_test_cases": [
+      {
+        "id": 1,
+        "input": "43261596",
+        "expected_output": "964176192",
+        "is_hidden": false
+      },
+      {
+        "id": 2,
+        "input": "1",
+        "expected_output": "2147483648",
+        "is_hidden": false
+      }
+    ],
+    "hidden_test_cases": [
+      {
+        "id": 101,
+        "input": "0",
+        "expected_output": "0",
+        "is_hidden": true
+      },
+      {
+        "id": 102,
+        "input": "4294967295",
+        "expected_output": "4294967295",
+        "is_hidden": true
+      },
+      {
+        "id": 103,
+        "input": "2147483648",
+        "expected_output": "1",
+        "is_hidden": true
+      }
+    ],
+    "starter_code": {
+      "python": "import sys\n\ndef solve():\n    raw = sys.stdin.read().strip()\n    if not raw: return\n    n = int(raw)\n    res = 0\n    for i in range(32):\n        res = (res << 1) | (n & 1)\n        n >>= 1\n    print(res)\n\nif __name__ == '__main__':\n    solve()\n",
+      "javascript": "const fs = require('fs');\n\nfunction solve() {\n    const raw = fs.readFileSync(0, 'utf-8').trim();\n    if (!raw) return;\n    let n = BigInt(raw);\n    let res = 0n;\n    for (let i = 0; i < 32; i++) {\n        res = (res << 1n) | (n & 1n);\n        n >>= 1n;\n    }\n    console.log(res.toString());\n}\n\nsolve();\n",
+      "cpp": "#include <iostream>\nusing namespace std;\n\nint main() {\n    unsigned int n;\n    if (!(cin >> n)) return 0;\n    unsigned int res = 0;\n    for (int i = 0; i < 32; i++) {\n        res = (res << 1) | (n & 1);\n        n >>= 1;\n    }\n    cout << res << endl;\n    return 0;\n}\n",
+      "java": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if (!sc.hasNextLong()) return;\n        long n = sc.nextLong();\n        long res = 0;\n        for (int i = 0; i < 32; i++) {\n            res = (res << 1) | (n & 1);\n            n >>= 1;\n        }\n        System.out.println(res);\n    }\n}\n",
+      "go": "package main\n\nimport (\n    \"fmt\"\n)\n\nfunc main() {\n    var n uint32\n    if _, err := fmt.Scan(&n); err != nil { return }\n    var res uint32\n    for i := 0; i < 32; i++ {\n        res = (res << 1) | (n & 1)\n        n >>= 1\n    }\n    fmt.Println(res)\n}\n"
+    },
+    "optimal_benchmarks": {
+      "python": {
+        "optimal_time_ms": 25,
+        "optimal_memory_kb": 4500
+      },
+      "javascript": {
+        "optimal_time_ms": 30,
+        "optimal_memory_kb": 5500
+      },
+      "cpp": {
+        "optimal_time_ms": 2,
+        "optimal_memory_kb": 1200
+      },
+      "java": {
+        "optimal_time_ms": 40,
+        "optimal_memory_kb": 12000
+      },
+      "go": {
+        "optimal_time_ms": 5,
+        "optimal_memory_kb": 2500
+      }
+    }
+  }
+]

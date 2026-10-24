@@ -380,6 +380,17 @@ export default function MasterProblemsPage() {
     setSaveMessage(null);
   };
 
+  const handleLoadCuratedBatch = async () => {
+    try {
+      const res = await fetch('/leetcode_batch_upload.json');
+      const text = await res.text();
+      setRawJson(text);
+      setSaveMessage(null);
+    } catch (err) {
+      console.error('Failed to load curated batch:', err);
+    }
+  };
+
   const handleDownloadTemplate = () => {
     const blob = new Blob([SAMPLE_PROBLEMS_JSON], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
@@ -1037,6 +1048,16 @@ export default function MasterProblemsPage() {
               <div className="flex flex-wrap items-center gap-2 text-xs">
                 <button
                   type="button"
+                  onClick={handleLoadCuratedBatch}
+                  className="px-2.5 py-1.5 bg-cyan-950/40 hover:bg-cyan-900/60 border border-cyan-800 text-cyan-200 hover:text-white uppercase flex items-center gap-1.5 transition font-bold"
+                  title="Load 11 curated LeetCode problems (Blind 75 & NeetCode 150)"
+                >
+                  <BookOpen className="w-3.5 h-3.5 text-cyan-400" />
+                  <span>LOAD LEETCODE 11-PACK</span>
+                </button>
+
+                <button
+                  type="button"
                   onClick={handleLoadSampleJson}
                   className="px-2.5 py-1.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-200 hover:text-white uppercase flex items-center gap-1.5 transition"
                 >
@@ -1044,15 +1065,15 @@ export default function MasterProblemsPage() {
                   <span>LOAD WORKING EXAMPLE</span>
                 </button>
 
-                <button
-                  type="button"
-                  onClick={handleDownloadTemplate}
+                <a
+                  href="/leetcode_batch_upload.json"
+                  download="leetcode_batch_upload.json"
                   className="px-2.5 py-1.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-200 hover:text-white uppercase flex items-center gap-1.5 transition"
-                  title="Download template.json for offline authoring"
+                  title="Download leetcode_batch_upload.json for local uploading"
                 >
                   <Download className="w-3.5 h-3.5 text-zinc-400" />
-                  <span>DOWNLOAD TEMPLATE</span>
-                </button>
+                  <span>DOWNLOAD BATCH JSON</span>
+                </a>
 
                 <button
                   type="button"

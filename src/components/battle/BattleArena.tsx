@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { SEED_PROBLEMS } from '@/lib/problems/data';
+import { getAllAvailableProblems } from '@/lib/problems/catalog';
 import { SUPPORTED_LANGUAGES, DEFAULT_LANGUAGE } from '@/lib/constants';
 import { LanguageKey, Problem, TestResult, BattlePlayer, BattleOpponentProgress } from '@/types';
 import { useUser } from '@/hooks/useUser';
@@ -26,8 +26,9 @@ export function BattleArena({ battleId }: BattleArenaProps) {
   const [showProblemDrawer, setShowProblemDrawer] = useState<boolean>(false);
 
   // Determine problem from battleId deterministically
-  const problemIndex = Math.abs(battleId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)) % SEED_PROBLEMS.length;
-  const initialProblem = SEED_PROBLEMS[problemIndex] || SEED_PROBLEMS[0];
+  const availableProblems = getAllAvailableProblems();
+  const problemIndex = Math.abs(battleId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)) % availableProblems.length;
+  const initialProblem = availableProblems[problemIndex] || availableProblems[0];
 
   // Problem & Battle State
   const [problem] = useState<Problem>(initialProblem);

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/server';
-import { SEED_PROBLEMS } from '@/lib/problems/data';
+import { getAllAvailableProblems } from '@/lib/problems/catalog';
 
 // In-memory queue and active battles for local development & multi-tab pairing
 interface LocalQueueEntry {
@@ -28,7 +28,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'user_id is required' }, { status: 400 });
     }
 
-    const randomProblem = SEED_PROBLEMS[Math.floor(Math.random() * SEED_PROBLEMS.length)];
+    const availableProblems = getAllAvailableProblems();
+    const randomProblem = availableProblems[Math.floor(Math.random() * availableProblems.length)];
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const isSupabaseLive = supabaseUrl && !supabaseUrl.includes('placeholder');
 

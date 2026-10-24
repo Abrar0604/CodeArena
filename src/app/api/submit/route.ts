@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { executePiston } from '@/lib/piston';
-import { SEED_PROBLEMS } from '@/lib/problems/data';
+import { getProblemBySlugOrId, getAllAvailableProblems } from '@/lib/problems/catalog';
 import { calculateSubmissionScore, ScoreWeights } from '@/lib/scoring';
 import { calculateElo } from '@/lib/elo';
 import { createAdminClient } from '@/lib/supabase/server';
@@ -28,7 +28,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const problem = SEED_PROBLEMS.find((p) => p.id === problem_id) || SEED_PROBLEMS[0];
+    const problem = getProblemBySlugOrId(problem_id) || getAllAvailableProblems()[0];
     const allTestCases = [...problem.sample_test_cases, ...problem.hidden_test_cases];
 
     const testResults: TestResult[] = [];

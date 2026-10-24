@@ -31,9 +31,8 @@ function AdminLoginContent() {
         throw new Error(data.error || 'Access denied');
       }
 
-      // Successful authorization, redirect to target admin page
-      router.push(from);
-      router.refresh();
+      // Successful authorization, hard redirect to ensure cookie is loaded
+      window.location.href = from;
     } catch (err: any) {
       setErrorMsg(err.message || 'Invalid master credentials');
     } finally {

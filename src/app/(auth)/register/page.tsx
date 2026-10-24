@@ -34,7 +34,12 @@ export default function RegisterPage() {
 
       if (error) throw error;
 
-      router.push('/lobby');
+      if (data.user && !data.session) {
+        setErrorMsg('Account created! Please check your email to confirm, or turn off "Confirm email" in Supabase Auth settings.');
+        return;
+      }
+
+      window.location.href = '/lobby';
     } catch (err: any) {
       setErrorMsg(err.message || 'Registration failed');
     } finally {

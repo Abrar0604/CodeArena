@@ -29,7 +29,7 @@ export default function LoginPage() {
         throw error;
       }
 
-      router.push('/lobby');
+      window.location.href = '/lobby';
     } catch (err: any) {
       setErrorMsg(err.message || 'Login failed');
     } finally {

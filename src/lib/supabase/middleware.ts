@@ -83,23 +83,10 @@ export async function updateSession(request: NextRequest) {
     pathname.startsWith('/login') ||
     pathname.startsWith('/register');
 
-  const isProtectedUserPage =
-    pathname.startsWith('/lobby') ||
-    pathname.startsWith('/battle') ||
-    pathname.startsWith('/profile');
-
-  // If user is signed in and visits auth page, redirect to lobby
+  // If user is already signed in and visits login/register, redirect to lobby
   if (user && isAuthPage) {
     const url = request.nextUrl.clone();
     url.pathname = '/lobby';
-    return NextResponse.redirect(url);
-  }
-
-  // If user is not signed in and visits protected user page
-  if (!user && isProtectedUserPage) {
-    const url = request.nextUrl.clone();
-    url.pathname = '/login';
-    url.searchParams.set('redirectTo', pathname);
     return NextResponse.redirect(url);
   }
 

@@ -15,7 +15,7 @@ export function Navbar() {
     { href: '/lobby', label: 'LOBBY', icon: Swords, requiresAuth: true },
     { href: '/practice', label: 'PRACTICE', icon: Target, requiresAuth: true },
     { href: '/analytics', label: 'ANALYTICS', icon: BarChart3, requiresAuth: true },
-    { href: '/leaderboard', label: 'LEADERBOARD', icon: Trophy, requiresAuth: false },
+    { href: '/leaderboard', label: 'LEADERBOARD', icon: Trophy, requiresAuth: true },
     { href: '/profile', label: 'PROFILE', icon: User, requiresAuth: true },
   ];
 

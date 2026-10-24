@@ -88,7 +88,8 @@ export async function updateSession(request: NextRequest) {
     pathname.startsWith('/practice') ||
     pathname.startsWith('/battle') ||
     pathname.startsWith('/profile') ||
-    pathname.startsWith('/analytics');
+    pathname.startsWith('/analytics') ||
+    pathname.startsWith('/leaderboard');
 
   const isPrefetch =
     request.headers.get('x-middleware-prefetch') === '1' ||

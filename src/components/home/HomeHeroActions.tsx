@@ -51,18 +51,10 @@ export function HomeHeroActions() {
 
       <Link
         href="/login"
-        className="w-full sm:w-auto px-7 py-3.5 bg-zinc-950 hover:bg-zinc-900 border border-zinc-700 text-zinc-200 hover:text-white font-bold tracking-widest uppercase transition flex items-center justify-center gap-2"
+        className="w-full sm:w-auto px-8 py-3.5 bg-zinc-950 hover:bg-zinc-900 border border-zinc-700 text-zinc-200 hover:text-white font-bold tracking-widest uppercase transition flex items-center justify-center gap-2"
       >
         <User className="w-4 h-4 text-zinc-400" />
-        <span>[ SIGN IN ]</span>
-      </Link>
-
-      <Link
-        href="/leaderboard"
-        className="w-full sm:w-auto px-6 py-3.5 bg-zinc-950 hover:bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-zinc-200 font-bold tracking-widest uppercase transition flex items-center justify-center gap-2"
-      >
-        <Trophy className="w-4 h-4 text-zinc-400" />
-        <span>[ GLOBAL RANKINGS ]</span>
+        <span>[ SIGN IN TO ARENA ]</span>
       </Link>
     </div>
   );

@@ -18,6 +18,10 @@ export const metadata: Metadata = {
   title: 'CodeArena — 1v1 Competitive Coding Battle Platform',
   description:
     'Real-time competitive coding battles. Race against opponents to solve algorithmic challenges scored on speed, time complexity, and space complexity.',
+  icons: {
+    icon: [{ url: '/icon.svg', type: 'image/svg+xml' }],
+    apple: [{ url: '/icon.svg', type: 'image/svg+xml' }],
+  },
 };
 
 export default function RootLayout({

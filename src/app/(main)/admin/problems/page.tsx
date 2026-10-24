@@ -16,6 +16,12 @@ import {
   Sparkles,
   Layers,
   Terminal,
+  FileJson,
+  Upload,
+  Download,
+  Copy,
+  Check,
+  AlertTriangle,
 } from 'lucide-react';
 import { Problem, TestCase } from '@/types';
 
@@ -169,20 +175,95 @@ if __name__ == '__main__':
   },
 };
 
-export default function MasterProblemsPage() {
-  // Master authorization guard
-  const [isUnlocked, setIsUnlocked] = useState<boolean>(true);
-  const [passcodeInput, setPasscodeInput] = useState<string>('');
-  const [authError, setAuthError] = useState<string | null>(null);
+// Ready-to-import multi-problem JSON example
+const SAMPLE_PROBLEMS_JSON = `[
+  {
+    "title": "Valid Palindrome",
+    "slug": "valid-palindrome",
+    "difficulty": "easy",
+    "description": "A phrase is a palindrome if, after converting all uppercase letters into lowercase letters and removing all non-alphanumeric characters, it reads the same forward and backward.\\n\\nGiven a string \`s\`, return \`true\` if it is a palindrome, or \`false\` otherwise.\\n\\n### Input Format\\n- A single line containing the string \`s\`.\\n\\n### Output Format\\n- Print \`true\` or \`false\`.",
+    "constraints": {
+      "time_limit_ms": 1000,
+      "memory_limit_kb": 64000
+    },
+    "sample_test_cases": [
+      {
+        "id": 1,
+        "input": "A man, a plan, a canal: Panama",
+        "expected_output": "true"
+      },
+      {
+        "id": 2,
+        "input": "race a car",
+        "expected_output": "false"
+      }
+    ],
+    "hidden_test_cases": [
+      {
+        "id": 101,
+        "input": " ",
+        "expected_output": "true"
+      },
+      {
+        "id": 102,
+        "input": "0P",
+        "expected_output": "false"
+      },
+      {
+        "id": 103,
+        "input": "ab_a",
+        "expected_output": "true"
+      }
+    ],
+    "starter_code": {
+      "python": "import sys\\n\\ndef solve():\\n    s = sys.stdin.read().strip()\\n    clean = [c.lower() for c in s if c.isalnum()]\\n    print('true' if clean == clean[::-1] else 'false')\\n\\nif __name__ == '__main__':\\n    solve()\\n"
+    }
+  },
+  {
+    "title": "Merge Intervals",
+    "slug": "merge-intervals",
+    "difficulty": "medium",
+    "description": "Given an array of intervals where \`intervals[i] = [start_i, end_i]\`, merge all overlapping intervals, and return an array of the non-overlapping intervals that cover all the intervals in the input.\\n\\n### Input Format\\n- First line contains \`N\`, the number of intervals.\\n- Next \`N\` lines each contain two space-separated integers \`start end\`.\\n\\n### Output Format\\n- Print each merged interval \`start end\` on a new line.",
+    "constraints": {
+      "time_limit_ms": 1000,
+      "memory_limit_kb": 64000
+    },
+    "sample_test_cases": [
+      {
+        "id": 1,
+        "input": "4\\n1 3\\n2 6\\n8 10\\n15 18",
+        "expected_output": "1 6\\n8 10\\n15 18"
+      },
+      {
+        "id": 2,
+        "input": "2\\n1 4\\n4 5",
+        "expected_output": "1 5"
+      }
+    ],
+    "hidden_test_cases": [
+      {
+        "id": 101,
+        "input": "1\\n1 4",
+        "expected_output": "1 4"
+      },
+      {
+        "id": 102,
+        "input": "3\\n1 4\\n0 2\\n3 5",
+        "expected_output": "0 5"
+      }
+    ]
+  }
+]`;
 
-  // Tabs: 'create' | 'catalog'
-  const [activeTab, setActiveTab] = useState<'create' | 'catalog'>('create');
+export default function MasterProblemsPage() {
+  // Tabs: 'create' | 'json_import' | 'catalog'
+  const [activeTab, setActiveTab] = useState<'create' | 'json_import' | 'catalog'>('create');
 
   // Existing problems catalog
   const [catalog, setCatalog] = useState<Problem[]>([]);
   const [loadingCatalog, setLoadingCatalog] = useState<boolean>(false);
 
-  // Form State
+  // Form State (Single Problem Commissioning)
   const [title, setTitle] = useState('');
   const [slug, setSlug] = useState('');
   const [difficulty, setDifficulty] = useState<'easy' | 'medium' | 'hard'>('medium');
@@ -206,7 +287,17 @@ export default function MasterProblemsPage() {
   const [isVerifying, setIsVerifying] = useState<boolean>(false);
   const [verificationResult, setVerificationResult] = useState<any | null>(null);
 
-  // Save status
+  // JSON Import State
+  const [rawJson, setRawJson] = useState<string>('');
+  const [jsonValidation, setJsonValidation] = useState<{ valid: boolean; count: number; error?: string }>({
+    valid: false,
+    count: 0,
+  });
+  const [parsedPreview, setParsedPreview] = useState<any[]>([]);
+  const [isImportingJson, setIsImportingJson] = useState<boolean>(false);
+  const [copiedExample, setCopiedExample] = useState<boolean>(false);
+
+  // Save / notification status
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [saveMessage, setSaveMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
@@ -228,6 +319,114 @@ export default function MasterProblemsPage() {
   useEffect(() => {
     fetchCatalog();
   }, []);
+
+  // Live validate JSON whenever rawJson changes
+  useEffect(() => {
+    if (!rawJson.trim()) {
+      setJsonValidation({ valid: false, count: 0 });
+      setParsedPreview([]);
+      return;
+    }
+
+    try {
+      const parsed = JSON.parse(rawJson);
+      let list: any[] = [];
+      if (Array.isArray(parsed)) {
+        list = parsed;
+      } else if (parsed && Array.isArray(parsed.problems)) {
+        list = parsed.problems;
+      } else if (parsed && typeof parsed === 'object') {
+        list = [parsed];
+      }
+
+      const validList = list.filter((p) => p && typeof p === 'object' && p.title);
+      if (validList.length === 0) {
+        setJsonValidation({
+          valid: false,
+          count: 0,
+          error: 'JSON is valid syntax, but no problem objects with a "title" property were detected.',
+        });
+        setParsedPreview([]);
+      } else {
+        setJsonValidation({ valid: true, count: validList.length });
+        setParsedPreview(validList);
+      }
+    } catch (err: any) {
+      setJsonValidation({
+        valid: false,
+        count: 0,
+        error: `Syntax Error: ${err.message}`,
+      });
+      setParsedPreview([]);
+    }
+  }, [rawJson]);
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const text = event.target?.result as string;
+      if (text) {
+        setRawJson(text);
+      }
+    };
+    reader.readAsText(file);
+  };
+
+  const handleLoadSampleJson = () => {
+    setRawJson(SAMPLE_PROBLEMS_JSON);
+    setSaveMessage(null);
+  };
+
+  const handleDownloadTemplate = () => {
+    const blob = new Blob([SAMPLE_PROBLEMS_JSON], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'codearena_problems_template.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleCopyExample = () => {
+    navigator.clipboard.writeText(SAMPLE_PROBLEMS_JSON);
+    setCopiedExample(true);
+    setTimeout(() => setCopiedExample(false), 2000);
+  };
+
+  const handleImportJsonBatch = async () => {
+    if (!jsonValidation.valid || parsedPreview.length === 0) return;
+
+    setIsImportingJson(true);
+    setSaveMessage(null);
+
+    try {
+      const res = await fetch('/api/admin/problems', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(parsedPreview),
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Failed to import problems');
+      }
+
+      setSaveMessage({
+        type: 'success',
+        text: `✓ Successfully commissioned ${data.count} problems into the live arena catalog!`,
+      });
+      fetchCatalog();
+    } catch (err: any) {
+      setSaveMessage({ type: 'error', text: err.message || 'Import failed.' });
+    } finally {
+      setIsImportingJson(false);
+    }
+  };
 
   const handleTitleChange = (val: string) => {
     setTitle(val);
@@ -370,11 +569,11 @@ export default function MasterProblemsPage() {
               </span>
             </div>
             <p className="text-xs text-zinc-400 font-mono">
-              SPECIFICATION AUTHORING // PISTON VERIFICATION // REALTIME PROBLEM COMMISSIONING
+              SPECIFICATION AUTHORING // BATCH JSON INGESTION // PISTON VERIFICATION
             </p>
           </div>
 
-          <div className="flex items-center gap-2 font-mono text-xs">
+          <div className="flex flex-wrap items-center gap-2 font-mono text-xs">
             <button
               onClick={() => setActiveTab('create')}
               className={`px-3 py-2 border font-bold uppercase tracking-wider transition ${
@@ -384,7 +583,19 @@ export default function MasterProblemsPage() {
               }`}
             >
               <span className="flex items-center gap-1.5">
-                <Plus className="w-3.5 h-3.5" /> COMMISSION PROBLEM
+                <Plus className="w-3.5 h-3.5" /> COMMISSION FORM
+              </span>
+            </button>
+            <button
+              onClick={() => setActiveTab('json_import')}
+              className={`px-3 py-2 border font-bold uppercase tracking-wider transition ${
+                activeTab === 'json_import'
+                  ? 'bg-white text-black border-white'
+                  : 'bg-zinc-900 border-zinc-700 text-zinc-400 hover:text-white'
+              }`}
+            >
+              <span className="flex items-center gap-1.5">
+                <FileJson className="w-3.5 h-3.5 text-cyan-400" /> JSON BATCH IMPORT
               </span>
             </button>
             <button
@@ -405,7 +616,20 @@ export default function MasterProblemsPage() {
           </div>
         </div>
 
-        {/* Tab 1: Create / Commission Form */}
+        {/* Global Notification Banner */}
+        {saveMessage && (
+          <div
+            className={`p-3.5 border font-mono text-xs ${
+              saveMessage.type === 'success'
+                ? 'bg-emerald-950/40 border-emerald-800 text-emerald-300'
+                : 'bg-rose-950/40 border-rose-800 text-rose-400'
+            }`}
+          >
+            {saveMessage.text}
+          </div>
+        )}
+
+        {/* Tab 1: Single Problem Commission Form */}
         {activeTab === 'create' && (
           <div className="space-y-8">
             {/* Quick Templates Bar */}
@@ -438,19 +662,6 @@ export default function MasterProblemsPage() {
                 </button>
               </div>
             </div>
-
-            {/* Notification message */}
-            {saveMessage && (
-              <div
-                className={`p-3.5 border font-mono text-xs ${
-                  saveMessage.type === 'success'
-                    ? 'bg-emerald-950/40 border-emerald-800 text-emerald-300'
-                    : 'bg-rose-950/40 border-rose-800 text-rose-400'
-                }`}
-              >
-                {saveMessage.text}
-              </div>
-            )}
 
             <form onSubmit={handlePublishProblem} className="space-y-8">
               {/* Problem Metadata Card */}
@@ -795,7 +1006,156 @@ export default function MasterProblemsPage() {
           </div>
         )}
 
-        {/* Tab 2: Catalog Inventory */}
+        {/* Tab 2: JSON File / Raw JSON Batch Ingestion */}
+        {activeTab === 'json_import' && (
+          <div className="space-y-6 font-mono">
+            {/* Control & Helper Toolbar */}
+            <div className="p-4 bg-zinc-950 border border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="space-y-1">
+                <span className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                  <FileJson className="w-4 h-4 text-cyan-400" />
+                  <span>BATCH JSON SPECIFICATION INGESTION</span>
+                </span>
+                <p className="text-[11px] text-zinc-400 font-sans">
+                  Upload or paste an array of problem objects. All valid problems will be parsed and commissioned in bulk.
+                </p>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2 text-xs">
+                <button
+                  type="button"
+                  onClick={handleLoadSampleJson}
+                  className="px-2.5 py-1.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-200 hover:text-white uppercase flex items-center gap-1.5 transition"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                  <span>LOAD WORKING EXAMPLE</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleDownloadTemplate}
+                  className="px-2.5 py-1.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-200 hover:text-white uppercase flex items-center gap-1.5 transition"
+                  title="Download template.json for offline authoring"
+                >
+                  <Download className="w-3.5 h-3.5 text-zinc-400" />
+                  <span>DOWNLOAD TEMPLATE</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleCopyExample}
+                  className="px-2.5 py-1.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-200 hover:text-white uppercase flex items-center gap-1.5 transition"
+                >
+                  {copiedExample ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5 text-zinc-400" />}
+                  <span>{copiedExample ? 'COPIED!' : 'COPY JSON'}</span>
+                </button>
+              </div>
+            </div>
+
+            {/* File Upload Drop Zone */}
+            <div className="p-6 bg-zinc-950 border border-dashed border-zinc-700 hover:border-zinc-500 text-center space-y-2 transition relative">
+              <input
+                type="file"
+                accept=".json,application/json"
+                onChange={handleFileUpload}
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+              />
+              <Upload className="w-6 h-6 text-zinc-400 mx-auto" />
+              <div className="text-xs font-bold text-zinc-200 uppercase tracking-wider">
+                DROP JSON FILE HERE OR CLICK TO BROWSE
+              </div>
+              <p className="text-[11px] text-zinc-500 font-sans">
+                Supports single problem object or array of problems (.json)
+              </p>
+            </div>
+
+            {/* Raw JSON Editor */}
+            <div className="p-6 bg-zinc-950 border border-zinc-800 space-y-3">
+              <div className="flex items-center justify-between border-b border-zinc-800 pb-2">
+                <span className="text-xs font-bold text-zinc-300 uppercase tracking-wider">
+                  RAW JSON PAYLOAD
+                </span>
+                <div className="text-xs">
+                  {jsonValidation.valid ? (
+                    <span className="text-emerald-400 font-bold flex items-center gap-1">
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                      VALID JSON ({jsonValidation.count} PROBLEM{jsonValidation.count > 1 ? 'S' : ''} DETECTED)
+                    </span>
+                  ) : jsonValidation.error ? (
+                    <span className="text-rose-400 flex items-center gap-1">
+                      <AlertTriangle className="w-3.5 h-3.5" />
+                      {jsonValidation.error}
+                    </span>
+                  ) : (
+                    <span className="text-zinc-500">PASTE OR DROP JSON TO PARSE</span>
+                  )}
+                </div>
+              </div>
+
+              <textarea
+                rows={14}
+                value={rawJson}
+                onChange={(e) => setRawJson(e.target.value)}
+                placeholder="Paste [ { 'title': '...', 'slug': '...', ... } ] here..."
+                className="w-full p-4 bg-zinc-900 border border-zinc-700 text-zinc-200 text-xs font-mono leading-relaxed focus:outline-none focus:border-white transition"
+              />
+            </div>
+
+            {/* Parsed Previews */}
+            {parsedPreview.length > 0 && (
+              <div className="p-6 bg-zinc-950 border border-zinc-800 space-y-4">
+                <div className="border-b border-zinc-800 pb-2 flex items-center justify-between">
+                  <span className="text-xs font-bold text-white uppercase tracking-wider">
+                    PARSED PROBLEMS PREVIEW ({parsedPreview.length} READY TO COMMISSION)
+                  </span>
+                  <span className="text-[10px] text-emerald-400 uppercase font-bold">ALL SCHEMAS VALID</span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {parsedPreview.map((item, idx) => (
+                    <div key={idx} className="p-3 bg-zinc-900/70 border border-zinc-800 space-y-1.5 text-xs">
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-white uppercase">{item.title}</span>
+                        <span
+                          className={`px-1.5 py-0.2 text-[10px] font-bold uppercase border ${
+                            item.difficulty === 'easy'
+                              ? 'bg-emerald-950/60 text-emerald-400 border-emerald-800'
+                              : item.difficulty === 'hard'
+                              ? 'bg-rose-950/60 text-rose-400 border-rose-800'
+                              : 'bg-amber-950/60 text-amber-400 border-amber-800'
+                          }`}
+                        >
+                          [{item.difficulty || 'medium'}]
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-zinc-400 line-clamp-2 font-sans">
+                        {item.description}
+                      </p>
+                      <div className="text-[10px] text-zinc-500 flex items-center gap-3 pt-1 border-t border-zinc-800">
+                        <span>SLUG: {item.slug || 'auto-generated'}</span>
+                        <span>SAMPLES: {item.sample_test_cases?.length || 0}</span>
+                        <span>HIDDEN: {item.hidden_test_cases?.length || 0}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <button
+                  type="button"
+                  disabled={isImportingJson}
+                  onClick={handleImportJsonBatch}
+                  className="w-full py-3.5 bg-white hover:bg-zinc-200 text-black font-mono font-black text-xs uppercase tracking-widest border border-white transition disabled:opacity-50"
+                >
+                  {isImportingJson
+                    ? 'IMPORTING PROBLEMS...'
+                    : `COMMISSION ALL ${parsedPreview.length} PROBLEM${parsedPreview.length > 1 ? 'S' : ''} TO ARENA`}
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Tab 3: Catalog Inventory */}
         {activeTab === 'catalog' && (
           <div className="space-y-4 font-mono">
             <div className="flex items-center justify-between border-b border-zinc-800 pb-3">

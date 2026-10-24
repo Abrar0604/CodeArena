@@ -1,16 +1,25 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useUser } from '@/hooks/useUser';
 import { RatingBadge } from '@/components/RatingBadge';
 import { Trophy, Swords, Shield, Zap, Edit2, Check, ArrowRight, ArrowUpRight, ArrowDownRight, Lock, LogIn, UserPlus } from 'lucide-react';
 import Link from 'next/link';
 
 export default function ProfilePage() {
+  const router = useRouter();
   const { user, mounted, loading, isAuthenticated, updateProfile } = useUser();
   const [isEditing, setIsEditing] = useState(false);
   const [usernameInput, setUsernameInput] = useState(user?.username || '');
   const [recentBattles, setRecentBattles] = useState<any[]>([]);
+
+  // Enforce authentication barrier
+  useEffect(() => {
+    if (mounted && !loading && (!isAuthenticated || !user)) {
+      router.replace('/login?redirectTo=/profile');
+    }
+  }, [mounted, loading, isAuthenticated, user, router]);
 
   useEffect(() => {
     try {

@@ -41,7 +41,9 @@ export default function RegisterPage() {
 
       if (signInError) throw signInError;
 
-      window.location.href = '/lobby';
+      const params = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+      const target = params?.get('redirectTo') || '/lobby';
+      window.location.href = target;
     } catch (err: any) {
       setErrorMsg(err.message || 'Registration failed');
     } finally {

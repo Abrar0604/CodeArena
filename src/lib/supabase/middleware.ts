@@ -83,11 +83,31 @@ export async function updateSession(request: NextRequest) {
     pathname.startsWith('/login') ||
     pathname.startsWith('/register');
 
+  const isProtectedPage =
+    pathname.startsWith('/lobby') ||
+    pathname.startsWith('/practice') ||
+    pathname.startsWith('/battle') ||
+    pathname.startsWith('/profile') ||
+    pathname.startsWith('/analytics');
+
+  const isPrefetch =
+    request.headers.get('x-middleware-prefetch') === '1' ||
+    request.headers.get('next-router-prefetch') === '1' ||
+    request.headers.get('purpose') === 'prefetch';
+
   // If user is already signed in and visits login/register, redirect to lobby
   if (user && isAuthPage) {
     const url = request.nextUrl.clone();
     url.pathname = '/lobby';
     return NextResponse.redirect(url);
+  }
+
+  // If unauthenticated user attempts to access protected combat or practice zones
+  if (!user && isProtectedPage && !isPrefetch) {
+    const loginUrl = request.nextUrl.clone();
+    loginUrl.pathname = '/login';
+    loginUrl.searchParams.set('redirectTo', pathname);
+    return NextResponse.redirect(loginUrl);
   }
 
   return supabaseResponse;

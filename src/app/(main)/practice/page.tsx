@@ -3,18 +3,28 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Target, Zap, Clock, Cpu, Search, Play, ArrowRight, ShieldCheck, Flame } from 'lucide-react';
+import { Target, Zap, Clock, Cpu, Search, Play, ArrowRight, ShieldCheck, Flame, Lock, LogIn, UserPlus } from 'lucide-react';
 import { Problem } from '@/types';
+import { useUser } from '@/hooks/useUser';
 
 export default function PracticeHubPage() {
   const router = useRouter();
+  const { user, mounted, loading: userLoading, isAuthenticated } = useUser();
   const [problems, setProblems] = useState<Problem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedDifficulty, setSelectedDifficulty] = useState<'all' | 'easy' | 'medium' | 'hard'>('all');
   const [completedSlugs, setCompletedSlugs] = useState<string[]>([]);
 
+  // Enforce authentication barrier
   useEffect(() => {
+    if (mounted && !userLoading && !isAuthenticated) {
+      router.replace('/login?redirectTo=/practice');
+    }
+  }, [mounted, userLoading, isAuthenticated, router]);
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
     // Load solved problems from localStorage
     try {
       const stored = localStorage.getItem('codearena_practice_completed');
@@ -38,7 +48,7 @@ export default function PracticeHubPage() {
       }
     }
     loadCatalog();
-  }, []);
+  }, [isAuthenticated]);
 
   const filteredProblems = useMemo(() => {
     return problems.filter((p) => {
@@ -77,6 +87,46 @@ export default function PracticeHubPage() {
         return 'text-zinc-400 border-zinc-700 bg-zinc-900';
     }
   };
+
+  if (mounted && !userLoading && !isAuthenticated) {
+    return (
+      <div className="min-h-[calc(100vh-3.5rem)] flex flex-col justify-center items-center px-4 py-12 bg-[#050507] text-zinc-100 font-sans">
+        <div className="max-w-md w-full bg-zinc-950 border border-zinc-800 p-8 space-y-6 text-center">
+          <div className="w-12 h-12 bg-zinc-900 border border-zinc-700 mx-auto flex items-center justify-center">
+            <Lock className="w-6 h-6 text-zinc-300" />
+          </div>
+          <div className="space-y-2">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-zinc-900 border border-zinc-800 text-[10px] font-mono text-zinc-400 uppercase tracking-widest">
+              <span>AUTHENTICATION REQUIRED</span>
+            </div>
+            <h2 className="text-xl font-mono font-black uppercase text-white tracking-tight">
+              PRACTICE CHAMBER ACCESS
+            </h2>
+            <p className="text-xs text-zinc-400 font-mono leading-relaxed">
+              Sign in or create an account to access the algorithmic problem catalog, execution sandbox, and calibration chamber.
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-2.5 pt-2 font-mono text-xs">
+            <Link
+              href="/login?redirectTo=/practice"
+              className="w-full py-3 bg-white hover:bg-zinc-200 text-zinc-950 font-black uppercase tracking-wider text-center border border-white transition flex items-center justify-center gap-2 shadow-sm"
+            >
+              <LogIn className="w-4 h-4" />
+              <span>[ SIGN IN WITH CREDENTIALS ]</span>
+            </Link>
+            <Link
+              href="/register?redirectTo=/practice"
+              className="w-full py-3 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-200 font-bold uppercase tracking-wider text-center transition flex items-center justify-center gap-2"
+            >
+              <UserPlus className="w-4 h-4" />
+              <span>[ CREATE COMBATANT ACCOUNT ]</span>
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#050507] text-zinc-100 py-10 px-4 sm:px-6">

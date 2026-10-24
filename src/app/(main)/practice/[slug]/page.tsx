@@ -22,6 +22,9 @@ import {
   Clock,
   ShieldCheck,
   CheckCircle2,
+  Lock,
+  LogIn,
+  UserPlus,
 } from 'lucide-react';
 
 interface PracticePageProps {
@@ -32,7 +35,14 @@ function PracticeArenaContent({ params }: PracticePageProps) {
   const resolvedParams = use(params);
   const slug = resolvedParams.slug;
   const router = useRouter();
-  const { user } = useUser();
+  const { user, mounted, loading: userLoading, isAuthenticated } = useUser();
+
+  // Enforce authentication barrier
+  useEffect(() => {
+    if (mounted && !userLoading && !isAuthenticated) {
+      router.replace(`/login?redirectTo=/practice/${slug}`);
+    }
+  }, [mounted, userLoading, isAuthenticated, router, slug]);
 
   const [problem, setProblem] = useState<Problem | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -246,6 +256,46 @@ function PracticeArenaContent({ params }: PracticePageProps) {
     const remainder = secs % 60;
     return `${String(mins).padStart(2, '0')}:${String(remainder).padStart(2, '0')}`;
   };
+
+  if (mounted && !userLoading && !isAuthenticated) {
+    return (
+      <div className="h-screen w-screen bg-[#050507] flex items-center justify-center p-4">
+        <div className="max-w-md w-full bg-zinc-950 border border-zinc-800 p-8 space-y-6 text-center">
+          <div className="w-12 h-12 bg-zinc-900 border border-zinc-700 mx-auto flex items-center justify-center">
+            <Lock className="w-6 h-6 text-zinc-300" />
+          </div>
+          <div className="space-y-2">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-zinc-900 border border-zinc-800 text-[10px] font-mono text-zinc-400 uppercase tracking-widest">
+              <span>AUTHENTICATION REQUIRED</span>
+            </div>
+            <h2 className="text-xl font-mono font-black uppercase text-white tracking-tight">
+              SOLO ARENA ACCESS
+            </h2>
+            <p className="text-xs text-zinc-400 font-mono leading-relaxed">
+              Sign in or create an account to run code, test edge cases, and submit algorithmic solutions.
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-2.5 pt-2 font-mono text-xs">
+            <Link
+              href={`/login?redirectTo=/practice/${slug}`}
+              className="w-full py-3 bg-white hover:bg-zinc-200 text-zinc-950 font-black uppercase tracking-wider text-center border border-white transition flex items-center justify-center gap-2 shadow-sm"
+            >
+              <LogIn className="w-4 h-4" />
+              <span>[ SIGN IN TO ENTER ARENA ]</span>
+            </Link>
+            <Link
+              href={`/register?redirectTo=/practice/${slug}`}
+              className="w-full py-3 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-200 font-bold uppercase tracking-wider text-center transition flex items-center justify-center gap-2"
+            >
+              <UserPlus className="w-4 h-4" />
+              <span>[ CREATE COMBATANT ACCOUNT ]</span>
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (loading || !problem) {
     return (

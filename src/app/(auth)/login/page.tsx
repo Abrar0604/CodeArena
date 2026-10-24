@@ -29,16 +29,14 @@ export default function LoginPage() {
         throw error;
       }
 
-      window.location.href = '/lobby';
+      const params = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+      const target = params?.get('redirectTo') || '/lobby';
+      window.location.href = target;
     } catch (err: any) {
       setErrorMsg(err.message || 'Login failed');
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleGuestPlay = () => {
-    router.push('/lobby');
   };
 
   return (
@@ -108,24 +106,8 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <div className="relative flex items-center justify-center">
-          <div className="border-t border-zinc-800 w-full" />
-          <span className="bg-zinc-950 px-2 text-[10px] uppercase font-mono text-zinc-500 absolute">
-            OR
-          </span>
-        </div>
-
-        {/* Guest Play */}
-        <button
-          onClick={handleGuestPlay}
-          className="w-full py-2.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-200 font-mono font-bold text-xs uppercase tracking-wider rounded-none flex items-center justify-center gap-2 transition"
-        >
-          <span>CONTINUE AS GUEST GLADIATOR</span>
-          <ArrowRight className="w-3.5 h-3.5 text-zinc-400" />
-        </button>
-
         {/* Register link */}
-        <p className="text-center text-xs text-zinc-500 font-mono">
+        <p className="text-center text-xs text-zinc-500 font-mono pt-2">
           NO CREDENTIALS FOUND?{' '}
           <Link href="/register" className="text-zinc-300 hover:text-white underline underline-offset-4">
             CREATE COMBATANT ID

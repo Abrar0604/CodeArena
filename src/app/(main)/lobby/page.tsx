@@ -14,6 +14,13 @@ export default function LobbyPage() {
   const { user, mounted, loading, isAuthenticated } = useUser();
   const { variant, config: ctaConfig, trackMetric } = useExperiment<LobbyCTAConfig>('lobby_cta_v1');
 
+  // Enforce authentication barrier
+  useEffect(() => {
+    if (mounted && !loading && !isAuthenticated) {
+      router.replace('/login?redirectTo=/lobby');
+    }
+  }, [mounted, loading, isAuthenticated, router]);
+
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [searchTime, setSearchTime] = useState<number>(0);
   const [selectedDifficulty, setSelectedDifficulty] = useState<'any' | 'easy' | 'medium'>('any');

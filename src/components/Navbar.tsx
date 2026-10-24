@@ -12,11 +12,11 @@ export function Navbar() {
   const { user, mounted, isAuthenticated, logout } = useUser();
 
   const navLinks = [
-    { href: '/lobby', label: 'LOBBY', icon: Swords },
-    { href: '/practice', label: 'PRACTICE', icon: Target },
-    { href: '/analytics', label: 'ANALYTICS', icon: BarChart3 },
-    { href: '/leaderboard', label: 'LEADERBOARD', icon: Trophy },
-    { href: '/profile', label: 'PROFILE', icon: User },
+    { href: '/lobby', label: 'LOBBY', icon: Swords, requiresAuth: true },
+    { href: '/practice', label: 'PRACTICE', icon: Target, requiresAuth: true },
+    { href: '/analytics', label: 'ANALYTICS', icon: BarChart3, requiresAuth: true },
+    { href: '/leaderboard', label: 'LEADERBOARD', icon: Trophy, requiresAuth: false },
+    { href: '/profile', label: 'PROFILE', icon: User, requiresAuth: true },
   ];
 
   const isArenaView =
@@ -49,13 +49,17 @@ export function Navbar() {
         <nav className="flex items-center gap-1 sm:gap-2 h-full">
           {navLinks.map((link) => {
             const Icon = link.icon;
+            const targetHref =
+              mounted && !isAuthenticated && link.requiresAuth
+                ? `/login?redirectTo=${encodeURIComponent(link.href)}`
+                : link.href;
             const isActive =
               pathname === link.href ||
               (link.href !== '/' && pathname.startsWith(link.href));
             return (
               <Link
                 key={link.href}
-                href={link.href}
+                href={targetHref}
                 className={`relative flex items-center gap-1.5 px-3 h-14 text-xs font-mono font-bold tracking-wider transition ${
                   isActive
                     ? 'text-zinc-50 border-b-2 border-zinc-100 bg-zinc-900/30'

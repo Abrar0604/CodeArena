@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { Swords, Target, BarChart3, ShieldCheck, Trophy, Sparkles } from 'lucide-react';
+import Link from 'next/link';
+import { Swords, Target, BarChart3, ShieldCheck, Trophy, Sparkles, Lock, LogIn, UserPlus } from 'lucide-react';
 import { useUser } from '@/hooks/useUser';
 import { getCompetitiveStats, getPracticeStats } from '@/lib/analytics/data';
 import { CompetitiveStats, PracticeStats } from '@/lib/analytics/types';
@@ -19,10 +20,17 @@ function AnalyticsContent() {
     tabParam === 'practice' ? 'practice' : 'competitive'
   );
 
-  const { user } = useUser();
+  const { user, mounted, loading: userLoading, isAuthenticated } = useUser();
   const [problems, setProblems] = useState<Problem[]>([]);
   const [competitiveStats, setCompetitiveStats] = useState<CompetitiveStats | null>(null);
   const [practiceStats, setPracticeStats] = useState<PracticeStats | null>(null);
+
+  // Enforce authentication barrier
+  useEffect(() => {
+    if (mounted && !userLoading && !isAuthenticated) {
+      router.replace('/login?redirectTo=/analytics');
+    }
+  }, [mounted, userLoading, isAuthenticated, router]);
 
   // Sync tab with URL
   useEffect(() => {
@@ -54,6 +62,46 @@ function AnalyticsContent() {
     }
     loadData();
   }, [user]);
+
+  if (mounted && !userLoading && !isAuthenticated) {
+    return (
+      <div className="min-h-[calc(100vh-3.5rem)] flex flex-col justify-center items-center px-4 py-12 bg-[#050507] text-zinc-100 font-sans">
+        <div className="max-w-md w-full bg-zinc-950 border border-zinc-800 p-8 space-y-6 text-center">
+          <div className="w-12 h-12 bg-zinc-900 border border-zinc-700 mx-auto flex items-center justify-center">
+            <Lock className="w-6 h-6 text-zinc-300" />
+          </div>
+          <div className="space-y-2">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-zinc-900 border border-zinc-800 text-[10px] font-mono text-zinc-400 uppercase tracking-widest">
+              <span>AUTHENTICATION REQUIRED</span>
+            </div>
+            <h2 className="text-xl font-mono font-black uppercase text-white tracking-tight">
+              TELEMETRY ACCESS
+            </h2>
+            <p className="text-xs text-zinc-400 font-mono leading-relaxed">
+              Sign in or create an account to view combat performance telemetry and practice metrics.
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-2.5 pt-2 font-mono text-xs">
+            <Link
+              href="/login?redirectTo=/analytics"
+              className="w-full py-3 bg-white hover:bg-zinc-200 text-zinc-950 font-black uppercase tracking-wider text-center border border-white transition flex items-center justify-center gap-2 shadow-sm"
+            >
+              <LogIn className="w-4 h-4" />
+              <span>[ SIGN IN WITH CREDENTIALS ]</span>
+            </Link>
+            <Link
+              href="/register?redirectTo=/analytics"
+              className="w-full py-3 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-200 font-bold uppercase tracking-wider text-center transition flex items-center justify-center gap-2"
+            >
+              <UserPlus className="w-4 h-4" />
+              <span>[ CREATE COMBATANT ACCOUNT ]</span>
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#050507] text-zinc-100 py-10 px-4 sm:px-6 font-sans">

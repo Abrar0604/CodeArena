@@ -1,7 +1,51 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
+import { isAuthorizedAdmin } from '@/lib/adminAuth';
 
 export async function updateSession(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  // ========================================================
+  // 1. MASTER ADMIN SECURITY BARRIER (ROBUST RBAC)
+  // Ensures normal users cannot access admin pages or APIs by editing URLs
+  // ========================================================
+  const isAdminApi = pathname.startsWith('/api/admin');
+  const isAdminPage = pathname.startsWith('/admin');
+
+  if (isAdminApi && pathname !== '/api/admin/auth') {
+    const isAuthorized = await isAuthorizedAdmin(request);
+    if (!isAuthorized) {
+      return NextResponse.json(
+        { error: 'Access Denied: Master Admin privileges required.' },
+        { status: 403 }
+      );
+    }
+  }
+
+  if (isAdminPage && pathname !== '/admin/login') {
+    const isAuthorized = await isAuthorizedAdmin(request);
+    if (!isAuthorized) {
+      const loginUrl = request.nextUrl.clone();
+      loginUrl.pathname = '/admin/login';
+      loginUrl.searchParams.set('from', pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+  }
+
+  // If already authorized admin visiting /admin/login, send straight to /admin/problems
+  if (pathname === '/admin/login') {
+    const isAuthorized = await isAuthorizedAdmin(request);
+    if (isAuthorized) {
+      const targetUrl = request.nextUrl.clone();
+      targetUrl.pathname = '/admin/problems';
+      targetUrl.searchParams.delete('from');
+      return NextResponse.redirect(targetUrl);
+    }
+  }
+
+  // ========================================================
+  // 2. SUPABASE AUTHENTICATION & USER SESSION PROTECTION
+  // ========================================================
   let supabaseResponse = NextResponse.next({
     request,
   });
@@ -9,7 +53,7 @@ export async function updateSession(request: NextRequest) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-  // If env vars are not set yet, allow request through gracefully
+  // If live Supabase is not configured yet, allow non-admin requests to proceed gracefully
   if (!supabaseUrl || !supabaseAnonKey || supabaseUrl.includes('placeholder')) {
     return supabaseResponse;
   }
@@ -36,13 +80,13 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const isAuthPage =
-    request.nextUrl.pathname.startsWith('/login') ||
-    request.nextUrl.pathname.startsWith('/register');
+    pathname.startsWith('/login') ||
+    pathname.startsWith('/register');
 
-  const isProtectedPage =
-    request.nextUrl.pathname.startsWith('/lobby') ||
-    request.nextUrl.pathname.startsWith('/battle') ||
-    request.nextUrl.pathname.startsWith('/profile');
+  const isProtectedUserPage =
+    pathname.startsWith('/lobby') ||
+    pathname.startsWith('/battle') ||
+    pathname.startsWith('/profile');
 
   // If user is signed in and visits auth page, redirect to lobby
   if (user && isAuthPage) {
@@ -51,11 +95,11 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // If user is not signed in and visits protected page
-  if (!user && isProtectedPage) {
+  // If user is not signed in and visits protected user page
+  if (!user && isProtectedUserPage) {
     const url = request.nextUrl.clone();
     url.pathname = '/login';
-    url.searchParams.set('redirectTo', request.nextUrl.pathname);
+    url.searchParams.set('redirectTo', pathname);
     return NextResponse.redirect(url);
   }
 

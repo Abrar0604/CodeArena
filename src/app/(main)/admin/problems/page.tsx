@@ -551,6 +551,11 @@ export default function MasterProblemsPage() {
     }
   };
 
+  const handleLockConsole = async () => {
+    await fetch('/api/admin/auth', { method: 'DELETE' });
+    window.location.href = '/admin/login';
+  };
+
   return (
     <div className="min-h-screen bg-[#050507] text-zinc-100 py-10 px-4 sm:px-6">
       <div className="max-w-6xl mx-auto space-y-8">
@@ -612,6 +617,14 @@ export default function MasterProblemsPage() {
               <span className="flex items-center gap-1.5">
                 <Layers className="w-3.5 h-3.5" /> CATALOG ({catalog.length})
               </span>
+            </button>
+
+            <button
+              onClick={handleLockConsole}
+              className="px-2.5 py-2 border border-rose-900/80 bg-rose-950/40 text-rose-400 hover:bg-rose-900/60 font-mono text-xs uppercase font-bold flex items-center gap-1.5 transition"
+              title="Terminate Master Admin Session"
+            >
+              <span>[LOCK CONSOLE]</span>
             </button>
           </div>
         </div>

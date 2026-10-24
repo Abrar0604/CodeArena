@@ -90,6 +90,15 @@ export default function ExperimentsAdminPage() {
               <RotateCcw className="w-3.5 h-3.5" />
               <span>RESET DATA</span>
             </button>
+            <button
+              onClick={async () => {
+                await fetch('/api/admin/auth', { method: 'DELETE' });
+                window.location.href = '/admin/login';
+              }}
+              className="px-3 py-2 bg-rose-950/40 hover:bg-rose-900/60 border border-rose-900/80 text-rose-400 font-mono text-xs uppercase tracking-wider rounded-none transition font-bold"
+            >
+              <span>[LOCK]</span>
+            </button>
             <Link
               href="/lobby"
               className="flex items-center gap-1.5 px-4 py-2 bg-white hover:bg-zinc-200 text-black font-mono font-bold text-xs uppercase tracking-wider border border-white rounded-none transition"

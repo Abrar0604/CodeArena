@@ -1,15 +1,28 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useUser } from '@/hooks/useUser';
 import { RatingBadge } from '@/components/RatingBadge';
-import { Trophy, Swords, Shield, Zap, Edit2, Check, ArrowRight } from 'lucide-react';
+import { Trophy, Swords, Shield, Zap, Edit2, Check, ArrowRight, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import Link from 'next/link';
 
 export default function ProfilePage() {
   const { user, updateProfile } = useUser();
   const [isEditing, setIsEditing] = useState(false);
   const [usernameInput, setUsernameInput] = useState(user?.username || '');
+  const [recentBattles, setRecentBattles] = useState<any[]>([]);
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('codearena_battle_history');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) {
+          setRecentBattles(parsed);
+        }
+      }
+    } catch {}
+  }, []);
 
   if (!user) {
     return (
@@ -138,35 +151,61 @@ export default function ProfilePage() {
           </div>
 
           <div className="space-y-2">
-            <div className="flex items-center justify-between p-3 bg-zinc-900/60 border border-zinc-800/80 rounded-none text-xs">
-              <div className="flex items-center gap-3">
-                <span className="px-2 py-0.5 rounded-none font-mono font-bold uppercase text-[10px] tracking-wider bg-emerald-950/60 text-emerald-400 border border-emerald-800">
-                  [VICTORY]
-                </span>
-                <div>
-                  <span className="font-mono font-bold text-zinc-200">vs ByteVanguard [1240]</span>
-                  <p className="text-[10px] text-zinc-500 font-mono">SPEC: Two Sum // RUNTIME: Python 3</p>
-                </div>
+            {recentBattles.length === 0 ? (
+              <div className="p-8 text-center bg-zinc-900/30 border border-zinc-800 text-xs font-mono space-y-3">
+                <p className="text-zinc-500 uppercase tracking-widest font-bold">
+                  [NO HISTORICAL COMBAT TELEMETRY]
+                </p>
+                <p className="text-zinc-400 font-sans text-xs max-w-sm mx-auto">
+                  You have not played any 1v1 battles yet. Enter the queue in the lobby to commence combat telemetry and earn ELO.
+                </p>
+                <Link
+                  href="/lobby"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 bg-white hover:bg-zinc-200 text-black font-bold uppercase tracking-wider text-xs border border-white transition"
+                >
+                  <Swords className="w-3.5 h-3.5" />
+                  <span>FIND FIRST MATCH</span>
+                </Link>
               </div>
-              <div className="text-right font-mono font-bold text-emerald-400 tabular-nums">
-                +28 ELO
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between p-3 bg-zinc-900/60 border border-zinc-800/80 rounded-none text-xs">
-              <div className="flex items-center gap-3">
-                <span className="px-2 py-0.5 rounded-none font-mono font-bold uppercase text-[10px] tracking-wider bg-rose-950/60 text-rose-400 border border-rose-800">
-                  [DEFEAT]
-                </span>
-                <div>
-                  <span className="font-mono font-bold text-zinc-200">vs AlgoGod [1410]</span>
-                  <p className="text-[10px] text-zinc-500 font-mono">SPEC: Valid Parentheses // RUNTIME: JavaScript</p>
-                </div>
-              </div>
-              <div className="text-right font-mono font-bold text-rose-400 tabular-nums">
-                -16 ELO
-              </div>
-            </div>
+            ) : (
+              recentBattles.map((b) => {
+                const isWin = b.verdict === 'VICTORY';
+                return (
+                  <div
+                    key={b.id}
+                    className="flex items-center justify-between p-3 bg-zinc-900/60 border border-zinc-800/80 rounded-none text-xs"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span
+                        className={`px-2 py-0.5 rounded-none font-mono font-bold uppercase text-[10px] tracking-wider border ${
+                          isWin
+                            ? 'bg-emerald-950/60 text-emerald-400 border-emerald-800'
+                            : 'bg-rose-950/60 text-rose-400 border-rose-800'
+                        }`}
+                      >
+                        [{b.verdict}]
+                      </span>
+                      <div>
+                        <span className="font-mono font-bold text-zinc-200">
+                          vs {b.opponentName} [{b.opponentRating}]
+                        </span>
+                        <p className="text-[10px] text-zinc-500 font-mono">
+                          SPEC: {b.problemTitle} // RUNTIME: {b.language}
+                        </p>
+                      </div>
+                    </div>
+                    <div
+                      className={`text-right font-mono font-bold tabular-nums flex items-center gap-0.5 ${
+                        isWin ? 'text-emerald-400' : 'text-rose-400'
+                      }`}
+                    >
+                      {isWin ? <ArrowUpRight className="w-3.5 h-3.5" /> : <ArrowDownRight className="w-3.5 h-3.5" />}
+                      <span>{b.ratingDelta > 0 ? `+${b.ratingDelta}` : b.ratingDelta} ELO</span>
+                    </div>
+                  </div>
+                );
+              })
+            )}
           </div>
         </div>
       </div>

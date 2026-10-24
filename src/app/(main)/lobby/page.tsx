@@ -160,7 +160,7 @@ export default function LobbyPage() {
             <div className="space-y-3">
               <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-zinc-950 border border-zinc-800 font-mono text-[11px] text-zinc-300 uppercase tracking-widest">
                 <span className="w-1.5 h-1.5 bg-emerald-400" />
-                <span>{ctaConfig?.badgeText || 'RANKED 1V1 PROTOCOL'}</span>
+                <span>{mounted && ctaConfig?.badgeText ? ctaConfig.badgeText : 'RANKED 1V1 PROTOCOL'}</span>
                 {mounted && variant && (
                   <span className="text-[10px] text-zinc-500 border-l border-zinc-800 pl-1.5">
                     {variant.id.toUpperCase()}
@@ -207,7 +207,7 @@ export default function LobbyPage() {
                 <div className="flex items-center justify-center gap-2.5">
                   <Swords className="w-4 h-4 stroke-[2.5]" />
                   <span>
-                    {ctaConfig?.buttonText
+                    {mounted && ctaConfig?.buttonText
                       ? `[ ${ctaConfig.buttonText.replace(/[⚡🔥]/g, '').trim()} ]`
                       : '[ ENGAGE 1V1 DUEL ]'}
                   </span>

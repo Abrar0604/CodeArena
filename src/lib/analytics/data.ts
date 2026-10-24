@@ -1,230 +1,109 @@
 import { CompetitiveStats, PracticeStats, CompetitiveMatchRecord, PracticeDrillRecord } from './types';
 import { Profile, Problem } from '@/types';
-import { getAllAvailableProblems } from '@/lib/problems/catalog';
-
-const DEFAULT_COMPETITIVE_MATCHES: CompetitiveMatchRecord[] = [
-  {
-    id: 'm-1',
-    opponentName: 'ByteVanguard',
-    opponentRating: 1240,
-    opponentAvatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=ByteVanguard',
-    problemTitle: 'Two Sum',
-    problemSlug: 'two-sum',
-    difficulty: 'easy',
-    language: 'Python 3',
-    elapsedSeconds: 218,
-    verdict: 'VICTORY',
-    ratingDelta: 28,
-    correctnessScore: 50.0,
-    speedScore: 23.5,
-    efficiencyScore: 22.0,
-    totalScore: 95.5,
-    playedAt: '12 minutes ago',
-  },
-  {
-    id: 'm-2',
-    opponentName: 'AlgoGod',
-    opponentRating: 1410,
-    opponentAvatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=AlgoGod',
-    problemTitle: 'Valid Parentheses',
-    problemSlug: 'valid-parentheses',
-    difficulty: 'easy',
-    language: 'JavaScript',
-    elapsedSeconds: 310,
-    verdict: 'DEFEAT',
-    ratingDelta: -16,
-    correctnessScore: 35.0,
-    speedScore: 18.0,
-    efficiencyScore: 19.5,
-    totalScore: 72.5,
-    playedAt: '1 hour ago',
-  },
-  {
-    id: 'm-3',
-    opponentName: 'RecursionQueen',
-    opponentRating: 1285,
-    opponentAvatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=Recursion',
-    problemTitle: 'Best Time to Buy and Sell Stock',
-    problemSlug: 'best-time-to-buy-and-sell-stock',
-    difficulty: 'easy',
-    language: 'Python 3',
-    elapsedSeconds: 184,
-    verdict: 'VICTORY',
-    ratingDelta: 22,
-    correctnessScore: 50.0,
-    speedScore: 24.2,
-    efficiencyScore: 23.1,
-    totalScore: 97.3,
-    playedAt: '3 hours ago',
-  },
-  {
-    id: 'm-4',
-    opponentName: 'BitwiseHero',
-    opponentRating: 1320,
-    opponentAvatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=Bitwise',
-    problemTitle: 'Maximum Subarray',
-    problemSlug: 'maximum-subarray',
-    difficulty: 'medium',
-    language: 'C++',
-    elapsedSeconds: 490,
-    verdict: 'VICTORY',
-    ratingDelta: 31,
-    correctnessScore: 50.0,
-    speedScore: 21.0,
-    efficiencyScore: 24.5,
-    totalScore: 95.5,
-    playedAt: '1 day ago',
-  },
-  {
-    id: 'm-5',
-    opponentName: 'Tourist_Alpha',
-    opponentRating: 1510,
-    opponentAvatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=Tourist',
-    problemTitle: '3Sum',
-    problemSlug: '3sum',
-    difficulty: 'medium',
-    language: 'Python 3',
-    elapsedSeconds: 620,
-    verdict: 'DEFEAT',
-    ratingDelta: -12,
-    correctnessScore: 40.0,
-    speedScore: 16.5,
-    efficiencyScore: 18.0,
-    totalScore: 74.5,
-    playedAt: '2 days ago',
-  },
-];
-
-const DEFAULT_PRACTICE_DRILLS: PracticeDrillRecord[] = [
-  {
-    id: 'd-1',
-    problemSlug: 'two-sum',
-    problemTitle: 'Two Sum',
-    difficulty: 'easy',
-    language: 'Python 3',
-    elapsedSeconds: 165,
-    correctnessScore: 50.0,
-    speedScore: 24.0,
-    efficiencyScore: 24.5,
-    totalScore: 98.5,
-    botPaceBeaten: true,
-    completedAt: 'Just now',
-  },
-  {
-    id: 'd-2',
-    problemSlug: 'valid-parentheses',
-    problemTitle: 'Valid Parentheses',
-    difficulty: 'easy',
-    language: 'JavaScript',
-    elapsedSeconds: 240,
-    correctnessScore: 50.0,
-    speedScore: 21.5,
-    efficiencyScore: 22.0,
-    totalScore: 93.5,
-    botPaceBeaten: true,
-    completedAt: '45 mins ago',
-  },
-  {
-    id: 'd-3',
-    problemSlug: 'binary-search',
-    problemTitle: 'Binary Search',
-    difficulty: 'easy',
-    language: 'Python 3',
-    elapsedSeconds: 112,
-    correctnessScore: 50.0,
-    speedScore: 24.8,
-    efficiencyScore: 25.0,
-    totalScore: 99.8,
-    botPaceBeaten: true,
-    completedAt: '2 hours ago',
-  },
-  {
-    id: 'd-4',
-    problemSlug: 'climbing-stairs',
-    problemTitle: 'Climbing Stairs',
-    difficulty: 'easy',
-    language: 'Python 3',
-    elapsedSeconds: 195,
-    correctnessScore: 50.0,
-    speedScore: 23.0,
-    efficiencyScore: 24.0,
-    totalScore: 97.0,
-    botPaceBeaten: false,
-    completedAt: '1 day ago',
-  },
-  {
-    id: 'd-5',
-    problemSlug: 'contains-duplicate',
-    problemTitle: 'Contains Duplicate',
-    difficulty: 'easy',
-    language: 'Python 3',
-    elapsedSeconds: 140,
-    correctnessScore: 50.0,
-    speedScore: 24.1,
-    efficiencyScore: 23.8,
-    totalScore: 97.9,
-    botPaceBeaten: true,
-    completedAt: '2 days ago',
-  },
-];
 
 export function getCompetitiveStats(user: Profile | null): CompetitiveStats {
-  const rating = user?.rating || 1200;
-  const matchesWon = user?.matches_won || 3;
-  const matchesPlayed = user?.matches_played || 5;
+  const rating = user?.rating ?? 1200;
+  const matchesWon = user?.matches_won ?? 0;
+  const matchesPlayed = user?.matches_played ?? 0;
   const matchesLost = Math.max(0, matchesPlayed - matchesWon);
   const winRate = matchesPlayed > 0 ? Math.round((matchesWon / matchesPlayed) * 100) : 0;
 
-  // Retrieve any locally recorded battle matches
-  let recentMatches = [...DEFAULT_COMPETITIVE_MATCHES];
+  // Retrieve only real locally recorded battle matches
+  let recentMatches: CompetitiveMatchRecord[] = [];
   if (typeof window !== 'undefined') {
     try {
       const stored = localStorage.getItem('codearena_battle_history');
       if (stored) {
         const parsed = JSON.parse(stored);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          recentMatches = [...parsed, ...recentMatches].slice(0, 20);
+        if (Array.isArray(parsed)) {
+          recentMatches = parsed.slice(0, 50);
         }
       }
     } catch {}
   }
 
-  // Calculate dynamic rating sparkline
-  const ratingHistory: { match: number; rating: number; date: string }[] = [];
-  let cur = rating - 50;
-  for (let i = 1; i <= Math.max(7, matchesPlayed); i++) {
-    cur += (i % 2 === 0 ? -12 : 24) + Math.floor(Math.random() * 8) - 4;
-    ratingHistory.push({
-      match: i,
-      rating: Math.max(1050, cur),
-      date: `Match #${i}`,
-    });
+  // Calculate actual current streak from real matches
+  let currentStreak = 0;
+  for (const m of recentMatches) {
+    if (m.verdict === 'VICTORY') {
+      currentStreak++;
+    } else {
+      break;
+    }
   }
-  // Make sure last point equals current rating
-  if (ratingHistory.length > 0) {
-    ratingHistory[ratingHistory.length - 1].rating = rating;
+
+  // If no matches recorded
+  if (recentMatches.length === 0 && matchesPlayed === 0) {
+    return {
+      rating,
+      peakRating: rating,
+      matchesPlayed: 0,
+      matchesWon: 0,
+      matchesLost: 0,
+      winRate: 0,
+      currentStreak: 0,
+      avgSolveTimeSecs: 0,
+      avgCorrectness: 0,
+      avgSpeed: 0,
+      avgEfficiency: 0,
+      avgTotalScore: 0,
+      ratingHistory: [
+        { match: 1, rating, date: 'Baseline' },
+      ],
+      languageDistribution: [],
+      recentMatches: [],
+    };
+  }
+
+  // Real match statistics
+  const totalCorrectness = recentMatches.reduce((acc, m) => acc + (m.correctnessScore || 0), 0);
+  const totalSpeed = recentMatches.reduce((acc, m) => acc + (m.speedScore || 0), 0);
+  const totalEfficiency = recentMatches.reduce((acc, m) => acc + (m.efficiencyScore || 0), 0);
+  const totalScore = recentMatches.reduce((acc, m) => acc + (m.totalScore || 0), 0);
+  const totalTime = recentMatches.reduce((acc, m) => acc + (m.elapsedSeconds || 0), 0);
+  const count = recentMatches.length || 1;
+
+  // Language breakdown from real matches
+  const langMap: Record<string, { matches: number; wins: number }> = {};
+  for (const m of recentMatches) {
+    const l = m.language || 'Unknown';
+    if (!langMap[l]) langMap[l] = { matches: 0, wins: 0 };
+    langMap[l].matches++;
+    if (m.verdict === 'VICTORY') langMap[l].wins++;
+  }
+
+  const languageDistribution = Object.entries(langMap).map(([language, data]) => ({
+    language,
+    matches: data.matches,
+    winRate: Math.round((data.wins / data.matches) * 100),
+  }));
+
+  // Build rating history from real matches (oldest to newest)
+  const ratingHistory = [...recentMatches].reverse().map((m, idx) => ({
+    match: idx + 1,
+    rating: rating,
+    date: `Match #${idx + 1}`,
+  }));
+
+  if (ratingHistory.length === 0) {
+    ratingHistory.push({ match: 1, rating, date: 'Current' });
   }
 
   return {
     rating,
-    peakRating: Math.max(rating + 65, 1285),
-    matchesPlayed,
-    matchesWon,
-    matchesLost,
-    winRate,
-    currentStreak: 2,
-    avgSolveTimeSecs: 364,
-    avgCorrectness: 47.0,
-    avgSpeed: 21.6,
-    avgEfficiency: 22.4,
-    avgTotalScore: 91.0,
+    peakRating: Math.max(rating, ...recentMatches.map((m) => m.opponentRating || rating)),
+    matchesPlayed: Math.max(matchesPlayed, recentMatches.length),
+    matchesWon: Math.max(matchesWon, recentMatches.filter((m) => m.verdict === 'VICTORY').length),
+    matchesLost: Math.max(matchesLost, recentMatches.filter((m) => m.verdict === 'DEFEAT').length),
+    winRate: recentMatches.length > 0 ? Math.round((recentMatches.filter((m) => m.verdict === 'VICTORY').length / recentMatches.length) * 100) : winRate,
+    currentStreak,
+    avgSolveTimeSecs: Math.round(totalTime / count),
+    avgCorrectness: Math.round((totalCorrectness / count) * 10) / 10,
+    avgSpeed: Math.round((totalSpeed / count) * 10) / 10,
+    avgEfficiency: Math.round((totalEfficiency / count) * 10) / 10,
+    avgTotalScore: Math.round((totalScore / count) * 10) / 10,
     ratingHistory,
-    languageDistribution: [
-      { language: 'Python 3', matches: 12, winRate: 67 },
-      { language: 'JavaScript', matches: 5, winRate: 60 },
-      { language: 'C++', matches: 3, winRate: 100 },
-      { language: 'Java', matches: 1, winRate: 0 },
-    ],
+    languageDistribution,
     recentMatches,
   };
 }
@@ -232,16 +111,16 @@ export function getCompetitiveStats(user: Profile | null): CompetitiveStats {
 export function getPracticeStats(problems: Problem[]): PracticeStats {
   const totalCatalog = problems.length > 0 ? problems.length : 17;
 
-  // Read completed slugs from localStorage
-  let completedSlugs: string[] = ['two-sum', 'valid-parentheses', 'binary-search', 'contains-duplicate', 'climbing-stairs'];
-  let recentDrills = [...DEFAULT_PRACTICE_DRILLS];
+  // Read only real completed slugs from localStorage (zero dummy data)
+  let completedSlugs: string[] = [];
+  let recentDrills: PracticeDrillRecord[] = [];
 
   if (typeof window !== 'undefined') {
     try {
       const stored = localStorage.getItem('codearena_practice_completed');
       if (stored) {
         const parsed = JSON.parse(stored);
-        if (Array.isArray(parsed) && parsed.length > 0) {
+        if (Array.isArray(parsed)) {
           completedSlugs = parsed;
         }
       }
@@ -249,8 +128,8 @@ export function getPracticeStats(problems: Problem[]): PracticeStats {
       const logsStored = localStorage.getItem('codearena_practice_logs');
       if (logsStored) {
         const parsedLogs = JSON.parse(logsStored);
-        if (Array.isArray(parsedLogs) && parsedLogs.length > 0) {
-          recentDrills = [...parsedLogs, ...recentDrills].slice(0, 20);
+        if (Array.isArray(parsedLogs)) {
+          recentDrills = parsedLogs.slice(0, 50);
         }
       }
     } catch {}
@@ -260,26 +139,61 @@ export function getPracticeStats(problems: Problem[]): PracticeStats {
   const mediumTotal = problems.filter((p) => p.difficulty.toLowerCase() === 'medium').length || 8;
   const hardTotal = problems.filter((p) => p.difficulty.toLowerCase() === 'hard').length || 2;
 
-  const easySolved = Math.min(easyTotal, completedSlugs.filter((s) => {
+  const easySolved = completedSlugs.filter((s) => {
     const prob = problems.find((p) => p.slug === s);
     return prob?.difficulty.toLowerCase() === 'easy';
-  }).length || 4);
+  }).length;
 
-  const mediumSolved = Math.min(mediumTotal, completedSlugs.filter((s) => {
+  const mediumSolved = completedSlugs.filter((s) => {
     const prob = problems.find((p) => p.slug === s);
     return prob?.difficulty.toLowerCase() === 'medium';
-  }).length || 2);
+  }).length;
 
-  const hardSolved = Math.min(hardTotal, completedSlugs.filter((s) => {
+  const hardSolved = completedSlugs.filter((s) => {
     const prob = problems.find((p) => p.slug === s);
     return prob?.difficulty.toLowerCase() === 'hard';
-  }).length || 0);
+  }).length;
 
-  const totalSolved = easySolved + mediumSolved + hardSolved;
-  const catalogMasteryRate = Math.round((totalSolved / totalCatalog) * 100);
+  const totalSolved = completedSlugs.length;
+  const catalogMasteryRate = totalCatalog > 0 ? Math.round((totalSolved / totalCatalog) * 100) : 0;
+
+  // Real average time from practice logs
+  const totalTime = recentDrills.reduce((acc, d) => acc + (d.elapsedSeconds || 0), 0);
+  const avgSolveTimeSecs = recentDrills.length > 0 ? Math.round(totalTime / recentDrills.length) : 0;
+  const firstTryPassRate = recentDrills.length > 0 ? Math.round((recentDrills.filter((d) => d.correctnessScore >= 50).length / recentDrills.length) * 100) : 0;
+  const avgTotalScore = recentDrills.length > 0 ? Math.round(recentDrills.reduce((acc, d) => acc + (d.totalScore || 0), 0) / recentDrills.length) : 0;
+
+  // Topic classification map
+  const topicMap: Record<string, { solved: number; total: number }> = {
+    'Arrays & Hashing': { solved: 0, total: 5 },
+    'Two Pointers & Sliding Window': { solved: 0, total: 4 },
+    'Dynamic Programming': { solved: 0, total: 3 },
+    'Binary Search': { solved: 0, total: 2 },
+    'Stack & Strings': { solved: 0, total: 3 },
+  };
+
+  for (const slug of completedSlugs) {
+    if (['two-sum', 'contains-duplicate', 'product-of-array-except-self', 'maximum-subarray'].includes(slug)) {
+      topicMap['Arrays & Hashing'].solved++;
+    } else if (['valid-palindrome', '3sum', 'trapping-rain-water', 'longest-substring-without-repeating-characters'].includes(slug)) {
+      topicMap['Two Pointers & Sliding Window'].solved++;
+    } else if (['climbing-stairs', 'coin-change', 'house-robber'].includes(slug)) {
+      topicMap['Dynamic Programming'].solved++;
+    } else if (['binary-search'].includes(slug)) {
+      topicMap['Binary Search'].solved++;
+    } else if (['valid-parentheses', 'valid-anagram'].includes(slug)) {
+      topicMap['Stack & Strings'].solved++;
+    }
+  }
+
+  const topicBreakdown = Object.entries(topicMap).map(([topic, counts]) => ({
+    topic,
+    solved: counts.solved,
+    total: counts.total,
+  }));
 
   return {
-    totalAttempted: totalSolved + 3,
+    totalAttempted: recentDrills.length,
     totalSolved,
     totalCatalogProblems: totalCatalog,
     catalogMasteryRate,
@@ -289,16 +203,10 @@ export function getPracticeStats(problems: Problem[]): PracticeStats {
     mediumTotal,
     hardSolved,
     hardTotal,
-    avgSolveTimeSecs: 198, // ~3m 18s
-    firstTryPassRate: 83.3,
-    benchmarkEfficiencyRatio: 94.2,
-    topicBreakdown: [
-      { topic: 'Arrays & Hashing', solved: 4, total: 6 },
-      { topic: 'Two Pointers & Sliding Window', solved: 2, total: 4 },
-      { topic: 'Dynamic Programming', solved: 2, total: 3 },
-      { topic: 'Binary Search', solved: 1, total: 2 },
-      { topic: 'Stack & Strings', solved: 1, total: 2 },
-    ],
+    avgSolveTimeSecs,
+    firstTryPassRate,
+    benchmarkEfficiencyRatio: avgTotalScore,
+    topicBreakdown,
     recentDrills,
   };
 }

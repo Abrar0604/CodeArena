@@ -79,7 +79,9 @@ export function CompetitiveDashboard({ stats }: CompetitiveDashboardProps) {
             <Shield className="w-3.5 h-3.5 text-emerald-400" />
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-black text-emerald-400 tabular-nums">{stats.winRate}%</span>
+            <span className="text-2xl font-black text-emerald-400 tabular-nums">
+              {stats.matchesPlayed > 0 ? `${stats.winRate}%` : '0%'}
+            </span>
             <span className="text-[10px] text-zinc-500 uppercase">
               ({stats.matchesWon}W - {stats.matchesLost}L)
             </span>
@@ -93,9 +95,11 @@ export function CompetitiveDashboard({ stats }: CompetitiveDashboardProps) {
             <Clock className="w-3.5 h-3.5 text-cyan-400" />
           </div>
           <div className="text-2xl font-black text-white tabular-nums">
-            {formatSeconds(stats.avgSolveTimeSecs)}
+            {stats.avgSolveTimeSecs > 0 ? formatSeconds(stats.avgSolveTimeSecs) : '--:--'}
           </div>
-          <p className="text-[10px] text-zinc-500 uppercase">TIME TO FIRST ACCEPTED SOLVE</p>
+          <p className="text-[10px] text-zinc-500 uppercase">
+            {stats.avgSolveTimeSecs > 0 ? 'TIME TO FIRST ACCEPTED SOLVE' : 'NO DUELS COMPLETED YET'}
+          </p>
         </div>
 
         <div className="p-4 bg-zinc-950 border border-zinc-800 space-y-1">
@@ -104,10 +108,14 @@ export function CompetitiveDashboard({ stats }: CompetitiveDashboardProps) {
             <Flame className="w-3.5 h-3.5 text-rose-400" />
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-black text-rose-400 tabular-nums">+{stats.currentStreak}</span>
+            <span className="text-2xl font-black text-rose-400 tabular-nums">
+              {stats.currentStreak > 0 ? `+${stats.currentStreak}` : '0'}
+            </span>
             <span className="text-[10px] text-zinc-500 uppercase">CONSECUTIVE</span>
           </div>
-          <p className="text-[10px] text-emerald-400 uppercase font-bold">STATUS: MOMENTUM PRIMED</p>
+          <p className="text-[10px] text-zinc-500 uppercase font-bold">
+            {stats.currentStreak > 0 ? 'STATUS: MOMENTUM PRIMED' : 'STATUS: UNRANKED STANDBY'}
+          </p>
         </div>
       </div>
 
@@ -267,21 +275,30 @@ export function CompetitiveDashboard({ stats }: CompetitiveDashboardProps) {
           </div>
 
           <div className="space-y-3">
-            {stats.languageDistribution.map((lang) => (
-              <div
-                key={lang.language}
-                className="p-2.5 bg-zinc-900/60 border border-zinc-800/80 space-y-1.5 text-xs"
-              >
-                <div className="flex justify-between items-center">
-                  <span className="font-bold text-zinc-200">{lang.language}</span>
-                  <span className="text-emerald-400 font-bold tabular-nums">{lang.winRate}% WIN</span>
-                </div>
-                <div className="flex justify-between text-[10px] text-zinc-500">
-                  <span>{lang.matches} MATCHES RECORDED</span>
-                  <span>PREFERENCE: {Math.round((lang.matches / 21) * 100)}%</span>
-                </div>
+            {stats.languageDistribution.length === 0 ? (
+              <div className="p-6 text-center text-xs text-zinc-500 uppercase">
+                <p className="font-bold">[NO COMBAT STACK DATA]</p>
+                <p className="text-[10px] text-zinc-600 mt-1 font-sans">
+                  Play a 1v1 battle to log your runtime language performance.
+                </p>
               </div>
-            ))}
+            ) : (
+              stats.languageDistribution.map((lang) => (
+                <div
+                  key={lang.language}
+                  className="p-2.5 bg-zinc-900/60 border border-zinc-800/80 space-y-1.5 text-xs"
+                >
+                  <div className="flex justify-between items-center">
+                    <span className="font-bold text-zinc-200">{lang.language}</span>
+                    <span className="text-emerald-400 font-bold tabular-nums">{lang.winRate}% WIN</span>
+                  </div>
+                  <div className="flex justify-between text-[10px] text-zinc-500">
+                    <span>{lang.matches} MATCHES RECORDED</span>
+                    <span>PREFERENCE: {Math.round((lang.matches / Math.max(1, stats.matchesPlayed)) * 100)}%</span>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
 
@@ -316,8 +333,18 @@ export function CompetitiveDashboard({ stats }: CompetitiveDashboardProps) {
           {/* Matches List */}
           <div className="space-y-2">
             {filteredMatches.length === 0 ? (
-              <div className="p-8 text-center text-xs text-zinc-600 uppercase">
-                NO MATCHES FOUND FOR FILTER
+              <div className="p-8 text-center text-xs text-zinc-500 uppercase space-y-3">
+                <p className="font-bold">[NO COMBAT TELEMETRY LOGGED YET]</p>
+                <p className="text-zinc-600 text-[11px] font-sans max-w-sm mx-auto">
+                  Your combat record is fresh. Enter matchmaking in the lobby to play live 1v1 duels against other combatants.
+                </p>
+                <Link
+                  href="/lobby"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 bg-white text-black font-bold uppercase tracking-wider text-xs border border-white hover:bg-zinc-200 transition"
+                >
+                  <Swords className="w-3.5 h-3.5" />
+                  <span>[ ENTER ARENA LOBBY ]</span>
+                </Link>
               </div>
             ) : (
               filteredMatches.map((m) => {

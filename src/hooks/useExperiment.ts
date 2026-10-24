@@ -11,14 +11,19 @@ export function useExperiment<T = any>(experimentId: string) {
   const { user } = useUser();
   const userId = user?.id || 'guest_user';
 
+  // Start with deterministic control variant on both server and client for 100% hydration consistency
   const [variant, setVariant] = useState<ExperimentVariant<T>>(() => {
-    return assignVariant<T>(experimentId, userId);
+    const exp = getExperiment(experimentId);
+    return exp ? (exp.variants[0] as ExperimentVariant<T>) : (null as any);
   });
+  const [mounted, setMounted] = useState<boolean>(false);
 
   const impressionLoggedRef = useRef<boolean>(false);
 
-  // Re-evaluate on user change or override event
+  // Re-evaluate on mount, user change or override event
   useEffect(() => {
+    setMounted(true);
+
     const updateVariant = () => {
       const v = assignVariant<T>(experimentId, userId);
       setVariant(v);
@@ -78,5 +83,6 @@ export function useExperiment<T = any>(experimentId: string) {
     trackMetric,
     setOverride,
     currentOverride: getManualOverride(experimentId),
+    mounted,
   };
 }

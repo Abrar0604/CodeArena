@@ -53,9 +53,11 @@ export function PracticeDashboard({ stats }: PracticeDashboardProps) {
             <Clock className="w-3.5 h-3.5 text-emerald-400" />
           </div>
           <div className="text-2xl font-black text-white tabular-nums">
-            {formatSeconds(stats.avgSolveTimeSecs)}
+            {stats.avgSolveTimeSecs > 0 ? formatSeconds(stats.avgSolveTimeSecs) : '--:--'}
           </div>
-          <p className="text-[10px] text-zinc-500 uppercase">ACROSS ALL COMPLETED DRILLS</p>
+          <p className="text-[10px] text-zinc-500 uppercase">
+            {stats.avgSolveTimeSecs > 0 ? 'ACROSS ALL COMPLETED DRILLS' : 'NO DRILLS COMPLETED YET'}
+          </p>
         </div>
 
         <div className="p-4 bg-zinc-950 border border-zinc-800 space-y-1">
@@ -64,9 +66,11 @@ export function PracticeDashboard({ stats }: PracticeDashboardProps) {
             <CheckCircle2 className="w-3.5 h-3.5 text-indigo-400" />
           </div>
           <div className="text-2xl font-black text-indigo-400 tabular-nums">
-            {stats.firstTryPassRate}%
+            {stats.totalAttempted > 0 ? `${stats.firstTryPassRate}%` : '--%'}
           </div>
-          <p className="text-[10px] text-zinc-500 uppercase">SOLUTIONS ACCEPTED ON RUN #1</p>
+          <p className="text-[10px] text-zinc-500 uppercase">
+            {stats.totalAttempted > 0 ? 'SOLUTIONS ACCEPTED ON RUN #1' : 'NO SUBMISSIONS LOGGED'}
+          </p>
         </div>
 
         <div className="p-4 bg-zinc-950 border border-zinc-800 space-y-1">
@@ -75,9 +79,11 @@ export function PracticeDashboard({ stats }: PracticeDashboardProps) {
             <Cpu className="w-3.5 h-3.5 text-emerald-400" />
           </div>
           <div className="text-2xl font-black text-emerald-400 tabular-nums">
-            {stats.benchmarkEfficiencyRatio}%
+            {stats.benchmarkEfficiencyRatio > 0 ? `${stats.benchmarkEfficiencyRatio}%` : '--%'}
           </div>
-          <p className="text-[10px] text-zinc-500 uppercase">COMPARED TO OPTIMAL O(N) SPEC</p>
+          <p className="text-[10px] text-zinc-500 uppercase">
+            {stats.benchmarkEfficiencyRatio > 0 ? 'COMPARED TO OPTIMAL O(N) SPEC' : 'AWAITING FIRST DRILL EVALUATION'}
+          </p>
         </div>
       </div>
 
@@ -222,7 +228,22 @@ export function PracticeDashboard({ stats }: PracticeDashboardProps) {
         </div>
 
         <div className="space-y-2">
-          {stats.recentDrills.map((d) => (
+          {stats.recentDrills.length === 0 ? (
+            <div className="p-8 text-center text-xs text-zinc-500 uppercase space-y-3 font-mono">
+              <p className="font-bold">[NO PRACTICE DRILLS COMPLETED YET]</p>
+              <p className="text-zinc-600 text-[11px] font-sans max-w-sm mx-auto">
+                Sharpen algorithmic execution velocity and verify solutions against automated test suites without ELO penalties.
+              </p>
+              <Link
+                href="/practice"
+                className="inline-flex items-center gap-1.5 px-4 py-2 bg-cyan-950 text-cyan-300 font-bold uppercase tracking-wider text-xs border border-cyan-800 hover:bg-cyan-900 transition"
+              >
+                <Target className="w-3.5 h-3.5" />
+                <span>[ EXPLORE PRACTICE CATALOG ]</span>
+              </Link>
+            </div>
+          ) : (
+            stats.recentDrills.map((d) => (
             <div
               key={d.id}
               className="p-3 bg-zinc-900/50 border border-zinc-800/80 hover:border-zinc-700 transition flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs"
@@ -277,7 +298,8 @@ export function PracticeDashboard({ stats }: PracticeDashboardProps) {
                 </Link>
               </div>
             </div>
-          ))}
+          ))
+        )}
         </div>
       </div>
     </div>
